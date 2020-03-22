@@ -26,7 +26,7 @@ io.set("log level", 1);
 
 //creating the messaging object & testroom with sample table
 var messaging = new Messaging();
-var room = new Room("Test Room");
+var room = new Room("Doko Room");
 room.tables = messaging.createSampleTables(1);
 
 //starting the socket and awaiting connections
@@ -44,7 +44,7 @@ io.sockets.on('connection', function (socket) {
     var name = data.name; //get the player's name
     player.setName(name);
     room.addPlayer(player); //add to room -- all players go to a room first
-    io.sockets.emit("logging", {message: name + " has connected."});
+    io.sockets.emit("logging", {message: name + " has connected to server."});
   });
 
   /* 
@@ -77,6 +77,7 @@ io.sockets.on('connection', function (socket) {
         io.sockets.emit("logging", {message: "There are " + table.players.length + " players at this table. Play will commence shortly." });
         //emit counter
         var countdown = 1; //3 seconds in reality...
+        console.log("3 sec timer starting...")
         setInterval(function() {
           countdown--;
           io.sockets.emit('timer', { countdown: countdown });
@@ -116,20 +117,29 @@ io.sockets.on('connection', function (socket) {
         if (table.players[i].id === startingPlayerID) { //this player will start the turn
           table.players[i].turnFinished = false;
           console.log(table.players[i].name + " starts the game.");
-          io.sockets.socket(table.players[i].id).emit("play", { hand: table.players[i].hand }); //send the cards in hands to player
-          io.sockets.socket(table.players[i].id).emit("turn", { myturn: true }); //send the turn-signal to player
-          io.sockets.socket(table.players[i].id).emit("ready", { ready: true }); //send the 'ready' signal
+          console.log(table.players[i].id);
+          // io.sockets.emit("play", { hand: table.players[i].hand }); //TEST GERRIT
+          // io.sockets.emit("turn", { myturn: true }); //send the turn-signal to player
+          // io.sockets.emit("ready", { ready: true }); //send the 'ready' signal
+          io.sockets.sockets[table.players[i].id].emit("play", { hand: table.players[i].hand }); //send the cards in hands to player
+          io.sockets.sockets[table.players[i].id].emit("turn", { myturn: true }); //send the turn-signal to player
+          io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
           if (table.gameObj.isActionCard(firstCardOnTable)) { //Is the first card on the table an action card?
             table.actionCard = true; //we are setting the action card flag to true -- this is required as the preliminary check is going to use this
           }
-          io.sockets.socket(table.players[i].id).emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
+          // io.sockets.emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
+          io.sockets.sockets[table.players[i].id].emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
         } else {
           table.players[i].turnFinished = true;
           console.log(table.players[i].name + " will not start the game.");
-          io.sockets.socket(table.players[i].id).emit("play", { hand: table.players[i].hand }); //send the card in hands to player
-          io.sockets.socket(table.players[i].id).emit("turn", { myturn: false }); //send the turn-signal to player
-          io.sockets.socket(table.players[i].id).emit("ready", { ready: true }); //send the 'ready' signal
-          io.sockets.socket(table.players[i].id).emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
+          // io.sockets.emit("play", { hand: table.players[i].hand }); //TEST GERRIT
+          // io.sockets.emit("turn", { myturn: false }); 
+          // io.sockets.emit("ready", { ready: true }); 
+          // io.sockets.emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
+          io.sockets.sockets[table.players[i].id].emit("play", { hand: table.players[i].hand }); //send the card in hands to player
+          io.sockets.sockets[table.players[i].id].emit("turn", { myturn: false }); //send the turn-signal to player
+          io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
+          io.sockets.sockets[table.players[i].id].emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
         }
       }
       //sends the cards to the table.

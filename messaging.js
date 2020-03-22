@@ -6,14 +6,17 @@ function Messaging() {};
 
 Messaging.prototype.sendEventToAllPlayers = function(event, message, io, player) {
 	for(var i = 0; i < player.length; i++){
-		io.sockets.socket(player[i].id).emit(event, message);
+		// io.sockets.emit(event, message);
+		io.sockets.sockets[player[i].id].emit(event, message);
+		// io.sockets.socket(player[i].id).emit(event, message);
+
 	}
 };
 
 Messaging.prototype.sendEventToAllPlayersButPlayer = function(event,message,io,players,player) {
 	for(var i = 0; i < players.length; i++) {
 		if(players[i].id != player.id) {
-			io.sockets.socket(players[i].id).emit(event, message);
+			io.sockets.sockets[players[i].id].emit(event, message);
 		}
 	}	
 };
@@ -21,7 +24,7 @@ Messaging.prototype.sendEventToAllPlayersButPlayer = function(event,message,io,p
 Messaging.prototype.sendEventToAPlayer = function(event,message,io,players,player) {
 	for(var i = 0; i < players.length; i++) {
 		if(players[i].id == player.id) {
-			io.sockets.socket(players[i].id).emit(event, message);
+			io.sockets.sockets[players[i].id].emit(event, message);
 		}
 	}	
 };
