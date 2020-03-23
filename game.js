@@ -7,18 +7,18 @@ var utils = new Utils();
 function Game() {
   this.pack = this._shufflePack(this._createPack());
 }
-//sets up two times 52 cards as a pack
+//sets up two times 20 cards as a pack
 Game.prototype._createPack = function() {
   var suits = ["H", "C", "S", "D"];
   var pack = [];
-  var n = 52;
+  var n = 20;
   var index = n / suits.length;
   var packCount= 0;
   for(i = 0; i <= 3; i++)
       for(j = 1; j <= index; j++) {
         pack[packCount++] = j + suits[i];
       }
-  finalPack = pack.concat(pack);
+  finalPack = pack.concat(pack); //2 times
   return finalPack;
 }
 //shuffles the pack - based on the Fisher-Yates algorithm

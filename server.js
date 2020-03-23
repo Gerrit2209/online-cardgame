@@ -112,30 +112,22 @@ io.sockets.on('connection', function (socket) {
       var firstCardOnTable = table.cardsOnTable = table.gameObj.playFirstCardToTable(table.pack); //assign first card on table
       table.status = "unavailable"; //set the table status to unavailable
       for (var i = 0; i < table.players.length; i++) { //go through the players array (contains all players sitting at a table)
-        table.players[i].hand = table.gameObj.drawCard(table.pack, 5, "", 1); //assign initial 5 cards to players
+        table.players[i].hand = table.gameObj.drawCard(table.pack, 10, "", 1); //assign initial 5 cards to players
         var startingPlayerID = table.playersID[randomNumber]; //get the ID of the randomly selected player who will start
         if (table.players[i].id === startingPlayerID) { //this player will start the turn
           table.players[i].turnFinished = false;
           console.log(table.players[i].name + " starts the game.");
-          console.log(table.players[i].id);
-          // io.sockets.emit("play", { hand: table.players[i].hand }); //TEST GERRIT
-          // io.sockets.emit("turn", { myturn: true }); //send the turn-signal to player
-          // io.sockets.emit("ready", { ready: true }); //send the 'ready' signal
+          // console.log(table.players[i].id);
           io.sockets.sockets[table.players[i].id].emit("play", { hand: table.players[i].hand }); //send the cards in hands to player
           io.sockets.sockets[table.players[i].id].emit("turn", { myturn: true }); //send the turn-signal to player
           io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
           if (table.gameObj.isActionCard(firstCardOnTable)) { //Is the first card on the table an action card?
             table.actionCard = true; //we are setting the action card flag to true -- this is required as the preliminary check is going to use this
           }
-          // io.sockets.emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
           io.sockets.sockets[table.players[i].id].emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
         } else {
           table.players[i].turnFinished = true;
           console.log(table.players[i].name + " will not start the game.");
-          // io.sockets.emit("play", { hand: table.players[i].hand }); //TEST GERRIT
-          // io.sockets.emit("turn", { myturn: false }); 
-          // io.sockets.emit("ready", { ready: true }); 
-          // io.sockets.emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
           io.sockets.sockets[table.players[i].id].emit("play", { hand: table.players[i].hand }); //send the card in hands to player
           io.sockets.sockets[table.players[i].id].emit("turn", { myturn: false }); //send the turn-signal to player
           io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
@@ -434,7 +426,7 @@ socket.on("preliminaryRoundCheck", function(data) {
     }
   });
 
-  socket.on("suiteRequest", function(data) {
+  socket.on("suiteRequest", function(data) { //entfernen
     if (data) {
       var table = room.getTable(data.tableID);
       messaging.sendEventToAllPlayersButPlayer("logging", {message: "Request for Suite: " + data.suite}, io, table.players, player);
