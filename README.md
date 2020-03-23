@@ -11,3 +11,12 @@ Play the game:
 Login to the URL defined in point 1, add your name and wait for another player to join. In a second browser, navigate to the same URL, enter your name and you'll be all set to play. Basic rules are: number to number / colour to colour. If player plays #2 card, next player either has to play another #2 or is forced to draw 2 cards.
 
 More updates coming soon.
+
+
+table.cardsOnTable
+table.pack
+table.stiche
+player.hand
+
+
+Stich 1-10

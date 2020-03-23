@@ -31,9 +31,11 @@ Game.prototype._shufflePack = function(pack) {
    }
   return pack;
 }
+//notwendig - Kartenverteilen
 //draw one card from the pack of cards, initial T|F appends cards in hand
   Game.prototype.drawCard = function(pack, amount, hand, initial) {
     var cards = [];
+    //return cards;
     cards = pack.slice(0, amount);
     pack.splice(0, amount);
     if (!initial) {
@@ -46,8 +48,10 @@ Game.prototype.playCard = function(index, hand, table) {
   var playedCard = hand.splice(index, 1); //we can only play one card at a time at the moment
   table.push.apply(table, playedCard);
 }
+//no card at start
 //at the start of the game, we put one card to the table from the pack (top card of the deck)
 Game.prototype.playFirstCardToTable = function(pack) {
+  // return ""
   return  pack.splice(0,1);
 }
 //not yet tested but - it should return all the cards on the table - so we can reshuffle it and use it as a new pack
@@ -63,8 +67,10 @@ Game.prototype.lastCardOnTable = function(table) {
   return utils.last(table);
 }
 
+//noneed
 Game.prototype.isCardPlayable = function(card, lastCardOnTable) {
-  if (card) {
+  return true
+  /* if (card) {
     var cardNumber = parseInt(card);
     var cardSuite = card[card.length-1];
     var lastCardNumber = parseInt(lastCardOnTable);
@@ -74,12 +80,13 @@ Game.prototype.isCardPlayable = function(card, lastCardOnTable) {
     } else {
       return false;
     }
-  }
+  } */
 }
 
 //off
 Game.prototype.isPenalisingActionCardPlayable = function(card, lastCardOnTable) {
-  if (card) {
+  return true
+  /* if (card) {
     var cardNumber = parseInt(card);
     var lastCardNumber = parseInt(lastCardOnTable);
     if (cardNumber === 9 && lastCardNumber === 9) { //2 und 2
@@ -87,12 +94,13 @@ Game.prototype.isPenalisingActionCardPlayable = function(card, lastCardOnTable) 
     } else {
       return false;
     } 
-  }
+  } */
 }
 
 //off
 Game.prototype.isRequestActionCardPlayable = function(card, lastCardOnTable) {
-  if (card) {
+  return true
+  /* if (card) {
     var cardNumber = parseInt(card);
     var lastCardNumber = parseInt(lastCardOnTable);
     if (cardNumber === 9  && lastCardNumber === 9) { //1 und 1
@@ -102,13 +110,14 @@ Game.prototype.isRequestActionCardPlayable = function(card, lastCardOnTable) {
     } else {
       return false;
     }
-  }
+  } */
 }
 
 //off
 /* checking if card is an action card */
 Game.prototype.isActionCard = function(card, penalising) {
-  penalising = (typeof penalising === "undefined") ? false : penalising;
+  return true
+  /* penalising = (typeof penalising === "undefined") ? false : penalising;
   if (card && !penalising) {
     var cardNumber = parseInt(card);
     console.log(cardNumber);
@@ -126,11 +135,13 @@ Game.prototype.isActionCard = function(card, penalising) {
     } else {
       return false;
     }
-  }
+  } */
 }
 
+//noNeed
 Game.prototype.isInHand = function(card, hand) { //checks whether there's a card in our hand, forced draw
-  if (card) {
+  return true
+  /* if (card) {
     cardNumber = parseInt(card);
     //parse numbers in hand
     var numbersInHand = [];
@@ -142,11 +153,13 @@ Game.prototype.isInHand = function(card, hand) { //checks whether there's a card
     } else {
       return false; //I can't play, force me to draw.
     }
-  }
+  } */
 }
 
+//noNeed
 Game.prototype.isSuiteInHand = function(suite, hand) {
-  if (suite) {
+  return true
+  /* if (suite) {
     var suitesInHand = [];
     for (var i = 0; i < hand.length; i++) {
       console.log(hand[i]);
@@ -157,9 +170,10 @@ Game.prototype.isSuiteInHand = function(suite, hand) {
     } else {
       return false;
     }
-  }
+  } */
 }
 
+//noNeed
 Game.prototype.isWinning = function(hand) {
   if (hand.length == 0) {
     return true;

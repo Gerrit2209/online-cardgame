@@ -136,6 +136,7 @@ io.sockets.on('connection', function (socket) {
       }
       //sends the cards to the table.
       messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: table.cardsOnTable}, io, table.players);
+      //messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: table.cardsOnTable}, io, table.players);
       io.sockets.emit('updatePackCount', {packCount: table.pack.length});
     }
   });
