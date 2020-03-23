@@ -378,12 +378,12 @@ socket.on("preliminaryRoundCheck", function(data) {
             if (!table.gameObj.isCardPlayable(playedCard, last)) {
               messaging.sendEventToAPlayer("logging", {message: "The selected card cannot be played - please read the rules."}, io, table.players, player); 
             } else {
-              if (parseInt(playedCard) === 2) { //if player plays a 2 we add the right flags
+              if (parseInt(playedCard) === 9) { //2//if player plays a 2 we add the right flags
                 console.log("if player plays a 2 we append the forced card limit");
                 table.actionCard = true;
                 table.penalisingActionCard = true;
               }
-              if (parseInt(playedCard) === 1) {
+              if (parseInt(playedCard) === 9) {//1
                 var option = "suite"
                 table.actionCard = true;
                 table.requestActionCard = true;

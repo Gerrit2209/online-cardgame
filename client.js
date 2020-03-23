@@ -74,11 +74,27 @@ socket.on("updatePackCount", function(data) {
 });
 
 socket.on("updateCardsOnTable", function(data){
+  console.log("lastCardOnTable" + data.lastCardOnTable);
   $("#table").text("");
   if (data.lastCardOnTable == "") {
     $("#table").text("");
   } else {
-    $("#table").append("<img width=100 src=resources/" + data.lastCardOnTable + ".png>");
+    pixel = 0;
+    $.each(data.cardsOnTable, function(k, v) {
+      index = k + 1;
+      $("#table").append("<div style='margin-top:2px; margin-left:" + pixel + "px; float: left; z-index:" + index + "''><img class='card"+k+"' width=100 src=resources/"+v+".png /></div>");
+      // $(".card"+k).click(function() { playCard(k, v); return false; });
+      if (pixel >= 0) {
+        pixel = (pixel + 40) * -1;
+      } else {
+        if (pixel <= -40)
+          pixel = pixel -1;
+        }
+    });
+
+
+    //$("#table").append("<img width=150 src=resources/" + data.lastCardOnTable + ".png>");
+    // $("#table").append("<div style='margin-top:2px; margin-left:" + pixel + "px; float: left; z-index:" + index + "''><img class='card"+k+"' width=100 src=resources/"+v+".png /></div>");
   }
 });
 

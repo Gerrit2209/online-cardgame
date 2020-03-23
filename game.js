@@ -77,11 +77,12 @@ Game.prototype.isCardPlayable = function(card, lastCardOnTable) {
   }
 }
 
+//off
 Game.prototype.isPenalisingActionCardPlayable = function(card, lastCardOnTable) {
   if (card) {
     var cardNumber = parseInt(card);
     var lastCardNumber = parseInt(lastCardOnTable);
-    if (cardNumber === 2 && lastCardNumber === 2) {
+    if (cardNumber === 9 && lastCardNumber === 9) { //2 und 2
         return true;
     } else {
       return false;
@@ -89,11 +90,12 @@ Game.prototype.isPenalisingActionCardPlayable = function(card, lastCardOnTable) 
   }
 }
 
+//off
 Game.prototype.isRequestActionCardPlayable = function(card, lastCardOnTable) {
   if (card) {
     var cardNumber = parseInt(card);
     var lastCardNumber = parseInt(lastCardOnTable);
-    if (cardNumber === 1  && lastCardNumber === 1) {
+    if (cardNumber === 9  && lastCardNumber === 9) { //1 und 1
         return true;
     } else if (cardNumber === 13 && lastCardNumber === 13) {
       return true;
@@ -103,13 +105,15 @@ Game.prototype.isRequestActionCardPlayable = function(card, lastCardOnTable) {
   }
 }
 
+//off
 /* checking if card is an action card */
 Game.prototype.isActionCard = function(card, penalising) {
   penalising = (typeof penalising === "undefined") ? false : penalising;
   if (card && !penalising) {
     var cardNumber = parseInt(card);
     console.log(cardNumber);
-    if (cardNumber in utils.has(["1", "2", "13"])) {
+    if (cardNumber in utils.has(["7", "8", "9"])) {
+    // if (cardNumber in utils.has(["1", "2", "13"])) {
       return true;
     } else {
       return false;
