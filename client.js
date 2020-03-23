@@ -74,7 +74,7 @@ socket.on("updatePackCount", function(data) {
 });
 
 socket.on("updateCardsOnTable", function(data){
-  console.log("lastCardOnTable" + data.lastCardOnTable);
+  //console.log("lastCardOnTable" + data.lastCardOnTable);
   $("#table").text("");
   if (data.lastCardOnTable == "") {
     $("#table").text("");

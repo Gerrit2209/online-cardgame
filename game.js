@@ -7,6 +7,7 @@ var utils = new Utils();
 function Game() {
   this.pack = this._shufflePack(this._createPack());
 }
+
 //sets up two times 20 cards as a pack
 Game.prototype._createPack = function() {
   var suits = ["H", "C", "S", "D"];
@@ -21,6 +22,7 @@ Game.prototype._createPack = function() {
   finalPack = pack.concat(pack); //2 times
   return finalPack;
 }
+
 //shuffles the pack - based on the Fisher-Yates algorithm
 Game.prototype._shufflePack = function(pack) {
   var i = pack.length, j, tempi, tempj;
@@ -31,7 +33,8 @@ Game.prototype._shufflePack = function(pack) {
    }
   return pack;
 }
-//notwendig - Kartenverteilen
+
+//initial dealing
 //draw one card from the pack of cards, initial T|F appends cards in hand
   Game.prototype.drawCard = function(pack, amount, hand, initial) {
     var cards = [];
@@ -43,17 +46,24 @@ Game.prototype._shufflePack = function(pack) {
     }
     return cards;
   }
-//plays a card with specific index, from specific hand, and places the card on the table
-Game.prototype.playCard = function(index, hand, table) {
-  var playedCard = hand.splice(index, 1); //we can only play one card at a time at the moment
-  table.push.apply(table, playedCard);
-}
+
 //no card at start
 //at the start of the game, we put one card to the table from the pack (top card of the deck)
 Game.prototype.playFirstCardToTable = function(pack) {
   // return ""
-  return  pack.splice(0,1);
+  return  pack.splice(0,1);//hier weitermachen
 }
+
+//plays a card with specific index, from specific hand, and places the card on the table
+Game.prototype.playCard = function(index, hand, table) {
+  var playedCard = hand.splice(index, 1); //we can only play one card at a time at the moment
+  if (table == "") {
+      table = playedCard;
+  } else {
+      table.push.apply(table, playedCard);
+  }
+}
+
 //not yet tested but - it should return all the cards on the table - so we can reshuffle it and use it as a new pack
 Game.prototype.cardsOnTable = function(table, card) {
   if (card) {
@@ -62,6 +72,7 @@ Game.prototype.cardsOnTable = function(table, card) {
     return table;
   }
 }
+
 //returns the last card on the table
 Game.prototype.lastCardOnTable = function(table) {
   return utils.last(table);
