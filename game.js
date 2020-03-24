@@ -50,15 +50,54 @@ Game.prototype._shufflePack = function(pack) {
   Game.prototype.takeTrick = function(table, player) {
     var cards = [];
     //return cards;
-    cards = table.cardsOnTable
-    if (cards.length == 4){
+    cards = table.cardsOnTable;
+    if (cards.length == table.playerLimit){
     table.cardsOnTable = "";//.splice(0, 4);
     if (player.trickCards.length > 1) {
       player.trickCards.push.apply(player.trickCards, cards);
     } else {
       player.trickCards = cards; 
     }
+    return true;
+  } else {
+    return false;
   }
+    // return cards;
+  }
+
+  Game.prototype.returnTrick = function(table, player) {
+    if (table.cardsOnTable.length == ""){
+      table.cardsOnTable=player.trickCards.splice(-table.playerLimit);
+      return true
+    } else {
+      return false
+    }
+  }
+
+  Game.prototype.returnCard = function(table, player) {
+    var i = [];
+    //return cards;
+    if (table.cardsOnTable.includes(player.currPlayedCard)){
+      console.log("1--- " + player.currPlayedCard);
+      console.log("2--- " + JSON.stringify(player.hand));
+      player.hand.push(player.currPlayedCard);
+      console.log("gamobj" + player.hand)
+      i = table.cardsOnTable.indexOf(player.currPlayedCard);//(player.currPlayedCard);
+      table.cardsOnTable.splice(i,1);//table.cardsOnTable.length-i,1);
+      player.currPlayedCard = "";
+      return true
+    }
+    else {
+      return false
+    }
+    // if (cards.length == 4){
+    // table.cardsOnTable = "";//.splice(0, 4);
+    // if (player.trickCards.length > 1) {
+    //   player.trickCards.push.apply(player.trickCards, cards);
+    // } else {
+    //   player.trickCards = cards; 
+    // }
+  // }
     // return cards;
   }
 

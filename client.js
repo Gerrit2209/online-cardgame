@@ -97,6 +97,23 @@ socket.on("updateCardsOnTable", function(data){
   }
 });
 
+socket.on("updateHand", function(data) {
+  $("#hand").text("");
+  $('#cards').find('option').remove().end();
+  pixel = 0;
+  $.each(data.hand, function(k, v) {
+    index = k + 1;
+    $("#hand").append("<div style='margin-top:2px; margin-left:" + pixel + "px; float: left; z-index:" + index + "''><img class='card"+k+"' width=100 src=resources/"+v+".png /></div>");
+    $(".card"+k).click(function() { playCard(k, v); return false; });
+    if (pixel >= 0) {
+      pixel = (pixel + 40) * -1;
+    } else {
+      if (pixel <= -40)
+        pixel = pixel -1;
+      }
+  });
+});
+
 socket.on("turn", function(data) {
   if(data.won) {
     $("#playArea").hide();
@@ -107,10 +124,10 @@ socket.on("turn", function(data) {
     }
   } else {
     if(data.myturn) {
-      $("#progressUpdate").html("<span class='label label-important'>It's your turn.</span>");
+      $("#progressUpdate").html("<span class='label label-important'>Noch keine Karte gespielt.</span>");
       socket.emit("preliminaryRoundCheck", {tableID: 1}); //When a player has a turn, we need to control a few items, this is what enables us to make it happen.
     } else {
-      $("#progressUpdate").html("<span class='label label-info'>It's your opponent's turn.</span>");
+      $("#progressUpdate").html("<span class='label label-info'>Du hast bereits eine Karte gespielt.</span>");
     }
   }
 });
@@ -175,6 +192,13 @@ $(document).ready(function() {
   $("#drawCard").click(function() {
     socket.emit("drawCard", {tableID: 1});
   });
+  $("#returnTrick").click(function() {
+    socket.emit("returnTrick", {tableID: 1});
+  });
+  $("#returnCard").click(function() {
+    socket.emit("returnCard", {tableID: 1});
+  });
+
   /*penalising card taken button*/ 
   $("#penalising").click(function() {
     socket.emit("penalisingTaken", {tableID: 1});

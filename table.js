@@ -14,7 +14,7 @@ function Table(tableID){
 	this.players = [];
 	this.playersID = [];
 	this.readyToPlayCounter = 0;
-	this.playerLimit = 2;
+	this.playerLimit = 4;
 	this.pack = [];
 	this.cardsOnTable = [];
 
