@@ -47,21 +47,41 @@ Game.prototype._shufflePack = function(pack) {
     return cards;
   }
 
+  Game.prototype.takeTrick = function(table, player) {
+    var cards = [];
+    //return cards;
+    cards = table.cardsOnTable
+    if (cards.length == 4){
+    table.cardsOnTable = "";//.splice(0, 4);
+    if (player.trickCards.length > 1) {
+      player.trickCards.push.apply(player.trickCards, cards);
+    } else {
+      player.trickCards = cards; 
+    }
+  }
+    // return cards;
+  }
+
 //no card at start
 //at the start of the game, we put one card to the table from the pack (top card of the deck)
 Game.prototype.playFirstCardToTable = function(pack) {
-  // return ""
-  return  pack.splice(0,1);//hier weitermachen
+  return ""
+  // return  pack.splice(0,1);//hier weitermachen
 }
 
 //plays a card with specific index, from specific hand, and places the card on the table
 Game.prototype.playCard = function(index, hand, table) {
   var playedCard = hand.splice(index, 1); //we can only play one card at a time at the moment
-  if (table == "") {
-      table = playedCard;
+  if (table.cardsOnTable == "") {
+    console.log("playCard empty")
+    console.log("playedCard: " + playedCard)
+      table.cardsOnTable = playedCard;
   } else {
-      table.push.apply(table, playedCard);
+    
+      table.cardsOnTable.push.apply(table.cardsOnTable, playedCard);
+      console.log("playCard: " + table)
   }
+  return table;
 }
 
 //not yet tested but - it should return all the cards on the table - so we can reshuffle it and use it as a new pack
@@ -71,124 +91,6 @@ Game.prototype.cardsOnTable = function(table, card) {
   } else {
     return table;
   }
-}
-
-//returns the last card on the table
-Game.prototype.lastCardOnTable = function(table) {
-  return utils.last(table);
-}
-
-//noneed
-Game.prototype.isCardPlayable = function(card, lastCardOnTable) {
-  return true
-  /* if (card) {
-    var cardNumber = parseInt(card);
-    var cardSuite = card[card.length-1];
-    var lastCardNumber = parseInt(lastCardOnTable);
-    var lastCardSuite = lastCardOnTable[lastCardOnTable.length-1];
-    if (cardNumber === lastCardNumber || cardSuite === lastCardSuite) {
-      return true;
-    } else {
-      return false;
-    }
-  } */
-}
-
-//off
-Game.prototype.isPenalisingActionCardPlayable = function(card, lastCardOnTable) {
-  return true
-  /* if (card) {
-    var cardNumber = parseInt(card);
-    var lastCardNumber = parseInt(lastCardOnTable);
-    if (cardNumber === 9 && lastCardNumber === 9) { //2 und 2
-        return true;
-    } else {
-      return false;
-    } 
-  } */
-}
-
-//off
-Game.prototype.isRequestActionCardPlayable = function(card, lastCardOnTable) {
-  return true
-  /* if (card) {
-    var cardNumber = parseInt(card);
-    var lastCardNumber = parseInt(lastCardOnTable);
-    if (cardNumber === 9  && lastCardNumber === 9) { //1 und 1
-        return true;
-    } else if (cardNumber === 13 && lastCardNumber === 13) {
-      return true;
-    } else {
-      return false;
-    }
-  } */
-}
-
-//off
-/* checking if card is an action card */
-Game.prototype.isActionCard = function(card, penalising) {
-  return true
-  /* penalising = (typeof penalising === "undefined") ? false : penalising;
-  if (card && !penalising) {
-    var cardNumber = parseInt(card);
-    console.log(cardNumber);
-    if (cardNumber in utils.has(["7", "8", "9"])) {
-    // if (cardNumber in utils.has(["1", "2", "13"])) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  if (card && penalising) {
-    var cardNumber = parseInt(card);
-    if (cardNumber === 2) {
-      return true;
-    } else {
-      return false;
-    }
-  } */
-}
-
-//noNeed
-Game.prototype.isInHand = function(card, hand) { //checks whether there's a card in our hand, forced draw
-  return true
-  /* if (card) {
-    cardNumber = parseInt(card);
-    //parse numbers in hand
-    var numbersInHand = [];
-    for (var i = 0; i < hand.length; i++) {
-      numbersInHand.push(parseInt(hand[i]));
-    }
-    if (utils.indexOf(numbersInHand, cardNumber) > -1) {
-      return true; //I can play a card if i want to
-    } else {
-      return false; //I can't play, force me to draw.
-    }
-  } */
-}
-
-//noNeed
-Game.prototype.isSuiteInHand = function(suite, hand) {
-  return true
-  /* if (suite) {
-    var suitesInHand = [];
-    for (var i = 0; i < hand.length; i++) {
-      console.log(hand[i]);
-      suitesInHand.push(hand[i][hand[i].length-1]);
-    }
-    if (utils.indexOf(suitesInHand, suite) > -1) {
-      return true;
-    } else {
-      return false;
-    }
-  } */
-}
-
-//noNeed
-Game.prototype.isWinning = function(hand) {
-  if (hand.length == 0) {
-    return true;
-  } else { return false; }
 }
 
 module.exports = Game;

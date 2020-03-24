@@ -40,6 +40,7 @@ io.sockets.on('connection', function (socket) {
   Message is shown in the logging board
   */
   socket.on('connectToServer',function(data) {
+    console.log("connectToServer called");
     var player = new Player(socket.id);
     var name = data.name; //get the player's name
     player.setName(name);
@@ -63,6 +64,7 @@ io.sockets.on('connection', function (socket) {
   */
 
   socket.on('connectToTable',function(data) {
+    console.log("connectToTable called");
     var player = room.getPlayer(socket.id);
     var table = room.getTable(data.tableID);
     if (table.addPlayer(player) && table.isTableAvailable()) {
@@ -117,13 +119,9 @@ io.sockets.on('connection', function (socket) {
         if (table.players[i].id === startingPlayerID) { //this player will start the turn
           table.players[i].turnFinished = false;
           console.log(table.players[i].name + " starts the game.");
-          // console.log(table.players[i].id);
           io.sockets.sockets[table.players[i].id].emit("play", { hand: table.players[i].hand }); //send the cards in hands to player
           io.sockets.sockets[table.players[i].id].emit("turn", { myturn: true }); //send the turn-signal to player
           io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
-          if (table.gameObj.isActionCard(firstCardOnTable)) { //Is the first card on the table an action card?
-            table.actionCard = true; //we are setting the action card flag to true -- this is required as the preliminary check is going to use this
-          }
           io.sockets.sockets[table.players[i].id].emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
         } else {
           table.players[i].turnFinished = true;
@@ -135,126 +133,15 @@ io.sockets.on('connection', function (socket) {
         }
       }
       //sends the cards to the table.
-      messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: table.cardsOnTable}, io, table.players);
+      messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: ""}, io, table.players);
+      console.log("CardsOnTable at readyToPlay ===> " + JSON.stringify(table.cardsOnTable))
       //messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: table.cardsOnTable}, io, table.players);
       io.sockets.emit('updatePackCount', {packCount: table.pack.length});
     }
   });
 
-/*
-Before the players have a chance to play in their respective turns
-i.e. draw or play a card, we are going to do preliminary checks
-These checks will determine whether there are (active) requests  or
-(active) penalising cards on the table
-*/
-
-socket.on("preliminaryRoundCheck", function(data) {
-  console.log("preliminary round check called.");
-  var player = room.getPlayer(socket.id);
-  var table = room.getTable(data.tableID);
-  var last = table.gameObj.lastCardOnTable(table.cardsOnTable); //last card on Table
-  console.log('Last card on table ==>' + last);
-
-    if (table.gameObj.isActionCard(last) && table.actionCard) { //Is the card on the table an action card?
-      if (table.gameObj.isActionCard(last, true)) { //Is the first card on the table a penalising card? (2*) (checked by the true flag)
-        table.forcedDraw += 2; //add 2 cards to the forcedDraw function
-        table.penalisingActionCard = true;
-        console.log("FORCED DRAW ==>" + table.forcedDraw);
-        console.log("it's a penalising card");
-        if (table.gameObj.isInHand(last, player.hand)) { //Does the starting player have a response in hand?
-          console.log("I have a 2, optionally i can play it"); //GIVE OPTIONS
-          socket.emit("playOption", { message: "You have a 2 card in your hand, you can either play it or take " + table.forcedDraw + " cards.", value: true}); //OPTION - TRUE
-        } else {
-          console.log("no 2 in hand, force me to draw"); //No penalising action card in hand, force draw
-          console.log("HAND ==> " + player.hand);
-          socket.emit("playOption", { value: false }); //OPTION - TRUE
-          table.gameObj.drawCard(table.pack, table.forcedDraw, player.hand, 0);
-          socket.emit("play", { hand: player.hand }); //send the card in hands to player
-          io.sockets.emit('updatePackCount', {packCount: table.pack.length});
-          table.forcedDraw = 0; //reset forced Draw variable
-          table.actionCard = false; //set the action card to false
-          table.penalisingActionCard = false; //reset the penalising action card variable
-          /*PROGRESS ROUND*/
-          table.progressRound(player); //end of turn
-          socket.emit("turn", {myturn: false}); //????
-          messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
-          messaging.sendEventToAllPlayersButPlayer("cardInHandCount", {cardsInHand: player.hand.length}, io, table.players, player);
-        }
-      } else { //Is the first card on the table a request card (1*, 13*)
-        console.log("it is a request card, player to make a request"); //SHOW REQUEST WINDOW
-        var option = "number";
-        if(parseInt(last) === 1) {
-          option = "suite";
-        }
-        if (firstRound === 1) {
-          socket.emit("showRequestCardDialog", { option: option });
-        }
-        //table.requestActionCard = true; //set the flag at the table
-        if (table.request && table.requestActionCard) {//request has already been made
-          console.log("asked for a suite ==> " + table.suiteRequest);
-          messaging.sendEventToAllPlayersButPlayer("logging", {message: "Your opponent has asked for a suite ==>" + table.suiteRequest}, io, table.players, player);
-          if (table.gameObj.isSuiteInHand(table.suiteRequest, player.hand)) {
-            io.sockets.emit("logging", {message: "Your opponent has asked for a suite ==>" + table.suiteRequest});
-            console.log("The requested suite is in your hand ==> " + table.suiteRequest);
-          } else { //the suite is not in the hand
-            if (table.gameObj.isInHand(last, player.hand)) { //give option for the player to play the same type of a request card
-              socket.emit("playOption", { message: "You have a request action card in your hand you can optionally play it.", value: true}); //OPTION - TRUE
-              console.log("You have an answer in your hand");
-            } else { //no requested suite nor contra-action card in hand, force draw
-              console.log("Forced draw");
-              socket.emit("playOption", { value: false }); //OPTION - TRUE
-              table.gameObj.drawCard(table.pack, 1, player.hand, 0);
-              socket.emit("play", { hand: player.hand }); //send the card in hands to player
-              io.sockets.emit('updatePackCount', {packCount: table.pack.length});
-              table.requestActionCard = null; //reset request
-              table.actionCard = false; //set the action card to false
-              /*PROGRESS ROUND*/
-              table.progressRound(player); //end of turn
-              socket.emit("turn", {myturn: false}); //????
-              messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
-              messaging.sendEventToAllPlayersButPlayer("cardInHandCount", {cardsInHand: player.hand.length}, io, table.players, player);
-            }
-          }
-        }
-      }
-    } else { //The first card on the table is not an action card at all
-      console.log(last + " is not an action card or we don't care about it anymore");
-    }
-  console.log("Table ==> " + JSON.stringify(table));
-  firstRound--;
-});
-
-  /* 
-  A player can decide to the penalty as a result of a penalising card (2*), if he does
-  then we need to reset the right variables and also end this player's turn.
-  */
-
-  socket.on("penalisingTaken", function(data) {
-    var player = room.getPlayer(socket.id);
-    var table = room.getTable(data.tableID);
-    if (table.actionCard) {
-      table.gameObj.drawCard(table.pack, table.forcedDraw, player.hand, 0);
-      socket.emit("play", { hand: player.hand }); //send the card in hands to player
-      io.sockets.emit('updatePackCount', {packCount: table.pack.length});
-      table.forcedDraw = 0; //reset forced Draw variable
-      table.actionCard = false; //set the action card to false
-      table.penalisingActionCard = false; //set the penalising action card to false;
-      /*PROGRESS ROUND*/
-      table.progressRound(player); //end of turn
-      socket.emit("turn", {myturn: false}); //????
-      messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
-      messaging.sendEventToAllPlayersButPlayer("cardInHandCount", {cardsInHand: player.hand.length}, io, table.players, player);
-    }
-  });
-
-  socket.on("suiteRequest", function(data) {
-    var player = room.getPlayer(socket.id);
-    var table = room.getTable(data.tableID);
-    table.suiteRequest = data.request;
-    console.log("request: " + data.request);
-  });
-
   socket.on("disconnect", function() {
+    console.log("disconnect called");
     var player = room.getPlayer(socket.id);
     if (player && player.status === "intable") { //make sure that player either exists or if player was in table (we don't want to remove players)
       //Remove from table
@@ -267,34 +154,38 @@ socket.on("preliminaryRoundCheck", function(data) {
   });
 
   socket.on("drawCard", function(data) {
+    console.log("Stich nehmen / drawCard called");
       var player = room.getPlayer(socket.id);
       var table = room.getTable(data.tableID);
-      if (!table.actionCard) { //action card start (listener), if there's an action card, we disable drawing
-        if (!player.turnFinished) {
-          var card = table.gameObj.drawCard(table.pack, 1, player.hand, 0);
-          if (table.pack.length < 1) { //when we drew the last card
-            var newPack = table.cardsOnTable; //remember the last card
-            if (table.pack.length != 1) {
-              newPack.pop(); //create new pack
-            }
-            var last = table.gameObj.lastCardOnTable(newPack); //last card on Table
-            table.pack = table.gameObj._shufflePack(table.cardsOnTable); //shuffle the new pack
-            table.cardsOnTable = last; //add the last card back on the table
-          }
-          socket.emit("play", {hand: player.hand});
-          messaging.sendEventToAPlayer("logging", {message: "You took " + card + " from the pack."}, io, table.players, player);
-          io.sockets.emit('updatePackCount', { packCount: table.pack.length });
-          table.progressRound(player); //end of turn
-          messaging.sendEventToAPlayer("turn", {myturn: false}, io, table.players, player);
-          messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
-          messaging.sendEventToAllPlayersButPlayer("cardInHandCount", {cardsInHand: player.hand.length}, io, table.players, player);
-        } else {
-          messaging.sendEventToAPlayer("logging", {message: "It's your opponent's turn."}, io, table.players, player);
-        }
-      }//end of actioncard
+       //action card start (listener), if there's an action card, we disable drawing
+        // if (!player.turnFinished) {
+          // var card = table.gameObj.takeTrick(table.pack, 1, player.hand, 0);
+          table.gameObj.takeTrick(table, player);
+          // // if (table.pack.length < 1) { //when we drew the last card
+          // //   var newPack = table.cardsOnTable; //remember the last card
+          // //   if (table.pack.length != 1) {
+          // //     newPack.pop(); //create new pack
+          // //   }
+          // //   var last = table.gameObj.lastCardOnTable(newPack); //last card on Table
+          // //   table.pack = table.gameObj._shufflePack(table.cardsOnTable); //shuffle the new pack
+          // //   table.cardsOnTable = last; //add the last card back on the table
+          // // }
+          // socket.emit("play", {hand: player.hand});
+          messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable}, io, table.players);
+          // messaging.sendEventToAPlayer("logging", {message: "You took " + card + " from the pack."}, io, table.players, player);
+          // io.sockets.emit('updatePackCount', { packCount: table.pack.length });
+          // table.progressRound(player); //end of turn
+          // messaging.sendEventToAPlayer("turn", {myturn: false}, io, table.players, player);
+          // messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
+          // messaging.sendEventToAllPlayersButPlayer("cardInHandCount", {cardsInHand: player.hand.length}, io, table.players, player);
+        // } else {
+        //   messaging.sendEventToAPlayer("logging", {message: "It's your opponent's turn."}, io, table.players, player);
+        // }
+      //end of actioncard
   });
 
   socket.on("playCard", function(data) {
+    console.log("playCard called");
       /*
       server needs to check:
       - if it's the player's turn
@@ -305,13 +196,14 @@ socket.on("preliminaryRoundCheck", function(data) {
       var errorFlag = false;
       var player = room.getPlayer(socket.id);
       var table = room.getTable(data.tableID);
-      var last = table.gameObj.lastCardOnTable(table.cardsOnTable); //last card on Table
+      // var last = table.gameObj.lastCardOnTable(table.cardsOnTable); //last card on Table
 
-      if (!player.turnFinished) {
+      if (!player.turnFinished && table.cardsOnTable.length != 4 ) {
         var playedCard = data.playedCard;
         var index = data.index; //from client
         var serverIndex = utils.indexOf(player.hand, data.playedCard);
-
+        // console.log("Table  ===> " + JSON.stringify(table))
+        
         console.log("index => " + index + " | serverindex ==> " + serverIndex);
 
         if (index == serverIndex) {
@@ -332,108 +224,22 @@ socket.on("preliminaryRoundCheck", function(data) {
           messaging.sendEventToAPlayer("logging", {message: "The card is not in your hand."}, io, table.players, player);
           socket.emit("play", {hand: player.hand});
         }
-        if (!errorFlag) {
-          if (table.actionCard) { //if the action card varialbe is already set ...
-            if (table.penalisingActionCard) {
-              if (!table.gameObj.isPenalisingActionCardPlayable(playedCard, last)) {
-                messaging.sendEventToAPlayer("logging", {message: "The selected card cannot be played - please read the rules."}, io, table.players, player); 
-              } else {
-                  console.log("Penalising action card is playable");
-                  if (parseInt(playedCard) === 2) { //if there's a penalising action card, the player can only play another penalising action card.
-                    console.log("if player plays a 2 we append the forced card limit");
-                    //we are going to hide the option
-                    socket.emit("playOption", { value: false }); //OPTION - FALSE
-                    table.actionCard = true;
-                    table.penalisingActionCard = true;
-                  }
-                table.gameObj.playCard(index, player.hand, table.cardsOnTable);
-                messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: playedCard}, io, table.players);
-                io.sockets.emit("logging", {message: player.name + " plays a card: " + playedCard});
-                table.progressRound(player); //end of turn
-                //notify frontend
-                messaging.sendEventToAPlayer("turn", {myturn: false}, io, table.players, player);
-                messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
-                messaging.sendEventToAllPlayersButPlayer("cardInHandCount", {cardsInHand: player.hand.length}, io, table.players, player);
-                var winner = table.gameObj.isWinning(player.hand);
-                if (!winner) {
-                  socket.emit("play", {hand: player.hand});
-                } else {
-                //game is finished
-                socket.emit("play", {hand: player.hand});
-                messaging.sendEventToAPlayer("turn", {won: "yes"}, io, table.players, player);
-                messaging.sendEventToAllPlayersButPlayer("turn", {won: "no"}, io, table.players, player);
-                socket.emit("gameover", {gameover: true});
-                io.sockets.emit("logging", {message: player.name + " is the WINNER!"});
-                }
-              }
-            } //end of penalising action card
-            if (table.gameObj.isActionCard(playedCard)) {
-                    socket.emit("playOption", { value: false }); //OPTION - FALSE
-                    table.actionCard = true;
-                    table.penalisingActionCard = true;
-          }
-
-          }
-          else { //no action card variable is set at the moment
-            var requestMade = false;
-            if (!table.gameObj.isCardPlayable(playedCard, last)) {
-              messaging.sendEventToAPlayer("logging", {message: "The selected card cannot be played - please read the rules."}, io, table.players, player); 
-            } else {
-              if (parseInt(playedCard) === 9) { //2//if player plays a 2 we add the right flags
-                console.log("if player plays a 2 we append the forced card limit");
-                table.actionCard = true;
-                table.penalisingActionCard = true;
-              }
-              if (parseInt(playedCard) === 9) {//1
-                var option = "suite"
-                table.actionCard = true;
-                table.requestActionCard = true;
-                console.log("in here");
-                messaging.sendEventToAPlayer("logging", {message: "YESSSSSSS"}, io, table.players, player);
-                messaging.sendEventToAPlayer("showRequestCardDialog", {option: option}, io, table.players, player);
-
-              }
-
-              /*if (parseInt(playedCard) === 13) {
-                table.actionCard = true;
-                table.requestActionCard = true;
-              } */
-              table.gameObj.playCard(index, player.hand, table.cardsOnTable);
-              messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: playedCard}, io, table.players);
-              io.sockets.emit("logging", {message: player.name + " plays a card: " + playedCard});
-              table.progressRound(player); //end of turn
-              //notify frontend
-              messaging.sendEventToAPlayer("turn", {myturn: false}, io, table.players, player);
-              messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
-              messaging.sendEventToAllPlayersButPlayer("cardInHandCount", {cardsInHand: player.hand.length}, io, table.players, player);
-              var winner = table.gameObj.isWinning(player.hand);
-              if (!winner) {
-                socket.emit("play", {hand: player.hand});
-              } else {
-              //game is finished
-              socket.emit("play", {hand: player.hand});
-              messaging.sendEventToAPlayer("turn", {won: "yes"}, io, table.players, player);
-              messaging.sendEventToAllPlayersButPlayer("turn", {won: "no"}, io, table.players, player);
-              socket.emit("gameover", {gameover: true});
-              io.sockets.emit("logging", {message: player.name + " is the WINNER!"});
-              }
-            }
-          } 
-        } else {
-            io.sockets.emit("logging", {message: "Error flag is TRUE, something went wrong"});
-        }
+          console.log(playedCard)
+          table.gameObj.playCard(index, player.hand, table);
+          console.log(playedCard)
+          console.log(table.cardsOnTable)
+          messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: playedCard}, io, table.players);
+          io.sockets.emit("logging", {message: player.name + " plays a card: " + playedCard});
+          console.log("CardsOnTable ===> " + JSON.stringify(table.cardsOnTable))
+          table.progressRound(player); //end of turn
+          //notify frontend
+          messaging.sendEventToAPlayer("turn", {myturn: false}, io, table.players, player);
+          messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
+          messaging.sendEventToAllPlayersButPlayer("cardInHandCount", {cardsInHand: player.hand.length}, io, table.players, player);
+          socket.emit("play", {hand: player.hand});
       } else { //end of turn
         messaging.sendEventToAPlayer("logging", {message: "It's your opponent's turn."}, io, table.players, player);
     }
   });
 
-  socket.on("suiteRequest", function(data) { //entfernen
-    if (data) {
-      var table = room.getTable(data.tableID);
-      messaging.sendEventToAllPlayersButPlayer("logging", {message: "Request for Suite: " + data.suite}, io, table.players, player);
-      table.actionCard = true;
-      table.requestActionCard = true;
-      console.log(table);
-    }
-  });
 });//end of socket.on

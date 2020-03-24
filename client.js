@@ -32,8 +32,6 @@ socket.on("showRequestCardDialog", function(data) {
   }
 });
 
-
-
 function playCard(key, value) {
   index = key;
   playedCard = value;
@@ -76,7 +74,8 @@ socket.on("updatePackCount", function(data) {
 socket.on("updateCardsOnTable", function(data){
   //console.log("lastCardOnTable" + data.lastCardOnTable);
   $("#table").text("");
-  if (data.lastCardOnTable == "") {
+  // if (data.lastCardOnTable == "") {
+  if (data.cardsOnTable == "") {
     $("#table").text("");
   } else {
     pixel = 0;

@@ -5,6 +5,7 @@ function Player(playerID) {
 	this.hand = [];
 	this.status = "";
 	this.turnFinished = "";
+	this.trickCards = "";
 };
 
 Player.prototype.setName = function(name) {
