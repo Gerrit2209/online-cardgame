@@ -1,4 +1,6 @@
-var socket = io.connect("localhost:8080");
+// var socket = io.connect("localhost:8080");
+var socket = io.connect("https://gerrit2209.github.io:8080");
+
 
 
 //var socket = io.connect("http://ec2-54-229-63-210.eu-west-1.compute.amazonaws.com:8080");
