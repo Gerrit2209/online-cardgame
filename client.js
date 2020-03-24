@@ -1,9 +1,10 @@
-// var socket = io.connect("localhost:8080");
-let port = process.env.PORT;
-if (port == null || port == "") {//local vs. heroku
-  port = 8080;
-}
-var socket = io.connect("https://stark-taiga-51826.herokuapp.com:" + port);
+// var socket = io.connect("localhost:5000");
+// let port = process.env.PORT;
+// if (port == null || port == "") {//local vs. heroku
+//   port = 8080;
+// }
+// var socket = io.connect("https://stark-taiga-51826.herokuapp.com:" + port);
+var socket = io.connect("https://stark-taiga-51826.herokuapp.com:");
 
 
 
