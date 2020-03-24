@@ -16,7 +16,13 @@ var app = express();
 app.use("/", express.static(__dirname + "/"));
 app.use("/resources", express.static(__dirname + "/resources"));
 var server = http.createServer(app);
-server.listen(8080);
+// server.listen(8080);
+let port = process.env.PORT;
+if (port == null || port == "") {//local vs. heroku
+  port = 8080;
+}
+app.listen(port);
+server.listen(process.env.PORT);
 var io = socket.listen(server);
 
 app.get('/', function (req, res) {

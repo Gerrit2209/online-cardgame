@@ -1,5 +1,5 @@
 // var socket = io.connect("localhost:8080");
-var socket = io.connect("https://gerrit2209.github.io:8080");
+var socket = io.connect("https://evening-dusk-26504.herokuapp.com/");
 
 
 
