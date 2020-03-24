@@ -4,7 +4,7 @@
 //   port = 8080;
 // }
 // var socket = io.connect("https://stark-taiga-51826.herokuapp.com:" + port);
-var socket = io.connect("https://stark-taiga-51826.herokuapp.com:");
+var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 
 
 
