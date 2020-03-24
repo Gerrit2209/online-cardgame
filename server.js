@@ -21,8 +21,8 @@ let port = process.env.PORT;
 if (port == null || port == "") {//local vs. heroku
   port = 8080;
 }
-app.listen(port);
-server.listen(process.env.PORT);
+server.listen(port);
+// server.listen(process.env.PORT);
 var io = socket.listen(server);
 
 app.get('/', function (req, res) {
