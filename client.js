@@ -1,8 +1,8 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
-//   var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
+  var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 // } else {
-  var socket = io.connect("localhost:5000");
+  // var socket = io.connect("localhost:5000");
 // }
 
 // let port = process.env.PORT;
