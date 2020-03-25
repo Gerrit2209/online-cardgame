@@ -20,3 +20,10 @@ player.hand
 
 
 Stich 1-10
+
+git add .
+git commit -m "text"
+git push
+git push heroku master
+heroku ps:scale web=1
+heroku local

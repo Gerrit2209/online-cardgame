@@ -7,6 +7,7 @@ function Player(playerID) {
 	this.turnFinished = "";
 	this.trickCards = "";
 	this.currPlayedCard = "";
+	this.cardOrder = 1;
 };
 
 Player.prototype.setName = function(name) {

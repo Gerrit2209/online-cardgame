@@ -19,7 +19,7 @@ var server = http.createServer(app);
 // server.listen(8080);
 let port = process.env.PORT;
 if (port == null || port == "") {//local vs. heroku
-  port = 8080;
+  port = 5000;
 }
 server.listen(port);
 // server.listen(process.env.PORT);
@@ -125,14 +125,14 @@ io.sockets.on('connection', function (socket) {
         // if (table.players[i].id === startingPlayerID) { //this player will start the turn
           table.players[i].turnFinished = false;
           console.log(table.players[i].name + " starts the game.");
-          io.sockets.sockets[table.players[i].id].emit("play", { hand: table.players[i].hand }); //send the cards in hands to player
+          io.sockets.sockets[table.players[i].id].emit("updateHand", { hand: table.players[i].hand }); //send the cards in hands to player
           io.sockets.sockets[table.players[i].id].emit("turn", { myturn: true }); //send the turn-signal to player
           io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
           io.sockets.sockets[table.players[i].id].emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
         // } else {
         //   table.players[i].turnFinished = true;
         //   console.log(table.players[i].name + " will not start the game.");
-        //   io.sockets.sockets[table.players[i].id].emit("play", { hand: table.players[i].hand }); //send the card in hands to player
+        //   io.sockets.sockets[table.players[i].id].emit("updateHand", { hand: table.players[i].hand }); //send the card in hands to player
         //   io.sockets.sockets[table.players[i].id].emit("turn", { myturn: false }); //send the turn-signal to player
         //   io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
         //   io.sockets.sockets[table.players[i].id].emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
@@ -206,9 +206,16 @@ io.sockets.on('connection', function (socket) {
         messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable}, io, table.players);
         // io.sockets.sockets[table.players[i].id].emit("updateHand", { hand: table.players[i].hand });
         messaging.sendEventToAPlayer('updateHand', {hand: player.hand}, io, table.players, player);
-}
+      }
+    });
+    
+    socket.on("sortCards", function(data) {
+      console.log("sortieren / sortCards called");
+      var player = room.getPlayer(socket.id);
+      var table = room.getTable(data.tableID);
+      var cardsReturned = table.gameObj.sortCards(table, player);
+      messaging.sendEventToAPlayer('updateHand', {hand: player.hand}, io, table.players, player);
   });
-
 
   socket.on("playCard", function(data) {
     console.log("playCard called");
@@ -238,7 +245,7 @@ io.sockets.on('connection', function (socket) {
           errorFlag = true;
           playedCard = null;
           messaging.sendEventToAPlayer("logging", {message: "Index mismatch - you have altered with the code."}, io, table.players, player);
-          socket.emit("play", {hand: player.hand});
+          socket.emit("updateHand", {hand: player.hand});
         }
 
         if (utils.indexOf(player.hand, data.playedCard) > -1) {
@@ -249,7 +256,7 @@ io.sockets.on('connection', function (socket) {
           errorFlag = true;
           playedCard = null;
           messaging.sendEventToAPlayer("logging", {message: "The card is not in your hand."}, io, table.players, player);
-          socket.emit("play", {hand: player.hand});
+          socket.emit("updateHand", {hand: player.hand});
         }
           console.log(playedCard)
           table.gameObj.playCard(index, player.hand, table);
@@ -264,7 +271,7 @@ io.sockets.on('connection', function (socket) {
           messaging.sendEventToAPlayer("turn", {myturn: false}, io, table.players, player);
           //messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
           messaging.sendEventToAllPlayersButPlayer("cardInHandCount", {cardsInHand: player.hand.length}, io, table.players, player);
-          socket.emit("play", {hand: player.hand});
+          socket.emit("updateHand", {hand: player.hand});
       } else { //end of turn
         messaging.sendEventToAPlayer("logging", {message: "Du hast bereits eine Karte gespielt."}, io, table.players, player);
     }

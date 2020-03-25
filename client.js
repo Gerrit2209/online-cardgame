@@ -1,10 +1,16 @@
-// var socket = io.connect("localhost:5000");
+// let port = process.env.PORT;
+// if (port == null || port == "") {//local vs. heroku
+//   var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
+// } else {
+  var socket = io.connect("localhost:5000");
+// }
+
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
 //   port = 8080;
 // }
 // var socket = io.connect("https://stark-taiga-51826.herokuapp.com:" + port);
-var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
+// var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 
 
 
@@ -56,7 +62,7 @@ function playCard(key, value) {
   //}
 }
 
-socket.on("play", function(data) {
+/* socket.on("play", function(data) {
   $("#hand").text("");
   $('#cards').find('option').remove().end();
   pixel = 0;
@@ -71,7 +77,7 @@ socket.on("play", function(data) {
         pixel = pixel -1;
       }
   });
-});
+}); */
 
 socket.on("updatePackCount", function(data) {
   $("#pack").text("");
@@ -204,6 +210,9 @@ $(document).ready(function() {
   });
   $("#returnCard").click(function() {
     socket.emit("returnCard", {tableID: 1});
+  });
+  $("#sortCards").click(function() {
+    socket.emit("sortCards", {tableID: 1});
   });
 
   /*penalising card taken button*/ 
