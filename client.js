@@ -1,39 +1,40 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
-  var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
+  // var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 // } else {
-  // var socket = io.connect("localhost:5000");
-// }
-
-// let port = process.env.PORT;
-// if (port == null || port == "") {//local vs. heroku
-//   port = 8080;
-// }
-// var socket = io.connect("https://stark-taiga-51826.herokuapp.com:" + port);
-// var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
-
-
-
-//var socket = io.connect("http://ec2-54-229-63-210.eu-west-1.compute.amazonaws.com:8080");
-socket.on("logging", function(data) {
-  $("#updates").append("<li>"+ data.message + "</li>");
-  var log = document.getElementById('footer');
-  log.scrollTop = log.scrollHeight;
-});
-
-socket.on("timer", function (data) {
-  $('#counter').html(data.countdown);
-  if (data.countdown === 0) {
-    socket.emit("readyToPlay", {tableID: 1});
-    $("#counter").hide();
-  }
-});
-
-socket.on("playOption", function(data){
-  $("#playOption").html(data.message);
-  if (data.value) {
-    $("#penalising").show();
-  } else {
+  var socket = io.connect("localhost:5000");
+  // }
+  
+  // let port = process.env.PORT;
+  // if (port == null || port == "") {//local vs. heroku
+  //   port = 8080;
+  // }
+  // var socket = io.connect("https://stark-taiga-51826.herokuapp.com:" + port);
+  // var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
+  
+  
+  
+  //var socket = io.connect("http://ec2-54-229-63-210.eu-west-1.compute.amazonaws.com:8080");
+  socket.on("logging", function(data) {
+    $("#updates").append("<li>"+ data.message + "</li>");
+    var log = document.getElementById('footer');
+    log.scrollTop = log.scrollHeight;
+  });
+  
+  socket.on("timer", function (data) {
+    $('#counter').html(data.countdown);
+    if (data.countdown === 0) {
+      socket.emit("readyToPlay", {tableID: 1});
+      $("#counter").hide();
+    }
+  });
+  
+  
+  socket.on("playOption", function(data){
+    $("#playOption").html(data.message);
+    if (data.value) {
+      $("#penalising").show();
+    } else {
     $("#penalising").hide();
     $("#playOption").hide();
   }
@@ -232,6 +233,7 @@ socket.on("tableFull", function(){
   $("#tableFull").fadeIn("slow");
 });
 
+// $-Funktionen & initial hide
 $(document).ready(function() {
   $("#tableFull").hide();
   $("#playArea").hide();
@@ -273,15 +275,19 @@ $(document).ready(function() {
     }
   });
 
-  $("#takeTrick").click(function() {
+  //Stich nehmen
+  $("#takeTrick").click(function() { 
     socket.emit("takeTrick", {tableID: 1});
   });
+  //Stich zurückgeben
   $("#returnTrick").click(function() {
     socket.emit("returnTrick", {tableID: 1});
   });
+  //Karte zurücknehmen
   $("#returnCard").click(function() {
     socket.emit("returnCard", {tableID: 1});
   });
+  //sortieren
   $("#sortCards").click(function() {
     socket.emit("sortCards", {tableID: 1});
   });

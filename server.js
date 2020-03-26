@@ -16,13 +16,13 @@ var app = express();
 app.use("/", express.static(__dirname + "/"));
 app.use("/resources", express.static(__dirname + "/resources"));
 var server = http.createServer(app);
-// server.listen(8080);
+
+//heroku setup listen auf env-Variable oder 5000
 let port = process.env.PORT;
 if (port == null || port == "") {//local vs. heroku
   port = 5000;
 }
 server.listen(port);
-// server.listen(process.env.PORT);
 var io = socket.listen(server);
 
 app.get('/', function (req, res) {
@@ -46,7 +46,7 @@ io.sockets.on('connection', function (socket) {
   Message is shown in the logging board
   */
   socket.on('connectToServer',function(data) {
-    console.log("connectToServer called");
+    console.log("connectToServer called by " + socket.id);
     var player = new Player(socket.id);
     var name = data.name; //get the player's name
     player.setName(name);
@@ -70,9 +70,9 @@ io.sockets.on('connection', function (socket) {
   */
 
   socket.on('connectToTable',function(data) {
-    console.log("connectToTable called");
     var player = room.getPlayer(socket.id);
     var table = room.getTable(data.tableID);
+    console.log("connectToTable called. tableID:" + data.tableID + " & table.status: " + table.status);
     if (table.addPlayer(player) && table.isTableAvailable()) {
       player.tableID = table.id;
       player.status = "intable";
@@ -92,6 +92,8 @@ io.sockets.on('connection', function (socket) {
         }, 1000);
       }
     } else {
+      console.log("addPlayer: " + table.addPlayer(player))
+      console.log("isTableAvailable: " + table.isTableAvailable())
       console.log("for whatever reason player can't be added to table."); //needs looking at
     }
   });
@@ -150,14 +152,15 @@ io.sockets.on('connection', function (socket) {
   socket.on("disconnect", function() {
     console.log("disconnect called");
     var player = room.getPlayer(socket.id);
-    if (player && player.status === "intable") { //make sure that player either exists or if player was in table (we don't want to remove players)
+    // if (player && player.status === "intable") { //make sure that player either exists or if player was in table (we don't want to remove players)
       //Remove from table
       var table = room.getTable(player.tableID);
       table.removePlayer(player);
       table.status = "available";
       player.status = "available";
+      console.log(player.name + " disconnected");
       io.sockets.emit("logging", {message: player.name + " has left the table."});
-    } 
+    // } 
   });
 
   socket.on("takeTrick", function(data) {//Stich nehmen

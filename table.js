@@ -18,7 +18,7 @@ function Table(tableID){
 	this.pack = [];
 	this.cardsOnTable = [];
 	this.trickNo = 1;
-	this.maxHandCards = 10;
+	this.maxHandCards = 2;
 
 	// this.actionCard = false;
 	// this.requestActionCard = false;
