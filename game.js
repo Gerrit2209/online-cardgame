@@ -53,15 +53,22 @@ Game.prototype._shufflePack = function(pack) {
     cards = table.cardsOnTable;
     if (cards.length == table.playerLimit){
     table.cardsOnTable = "";//.splice(0, 4);
-    if (player.trickCards.length > 1) {
-      player.trickCards.push.apply(player.trickCards, cards);
+      if (player.trickCards.length > 1) {
+        player.trickCards.push.apply(player.trickCards, cards);
+        player.trickCardsNo = player.trickCardsNo.concat(table.trickNo);
+      } else {
+        player.trickCards = cards;
+        player.trickCardsNo = [table.trickNo] 
+      }
+      // //Spielende
+      // if(table.trickNo == 10){
+      //   //send message
+      //   messaging.sendEventToAllPlayers('updateTricksWonByPlayer', {cardsOnTable: table.cardsOnTable}, io, table.players);
+      // }
+      return true;
     } else {
-      player.trickCards = cards; 
+      return false;
     }
-    return true;
-  } else {
-    return false;
-  }
     // return cards;
   }
 
@@ -94,32 +101,34 @@ Game.prototype._shufflePack = function(pack) {
 
   Game.prototype.sortCards = function(table, player) {
     player.cardOrder++
-    var standard = ["2H", "4C", "4S", "4H", "4D", "3C", "3S", "3H", "3D", "1D", "2D", "5D", "1C", "2C", "5C", "1S", "2S", "5S", "1H", "2H", "5H"];
+    var standard = ["2H", "4C", "4S", "4H", "4D", "3C", "3S", "3H", "3D", "1D", "2D", "5D", "1C", "2C", "5C", "1S", "2S", "5S", "1H", "5H"];
     var solo = ["1C", "2C", "5C", "4C", "3C", "1S", "2S", "5S", "4S", "3S", "1H", "2H", "5H", "4H", "3H", "1D", "2D", "5D", "4D", "3D"];
     var card = "";
     var newHand = "";
-    if ((player.cardOrder%3) == 2){
+    if ((player.cardOrder%2) == 0){
       for (let i = 0; i < standard.length; i++) {
         var searchCard = standard[i];
         card = player.hand.filter(sortFunction)
-        if (card != "" && card != null && newHand == ""){
+        if(card != "" && newHand.length == ""){
           newHand = card;
-        } else if (card != "" && card != null){
-          newHand.push(card);
+        } else if (card != ""){
+          newHand = newHand.concat(card);
         }
       }
       player.hand = newHand;
-    } else if ((player.cardOrder%3) == 0){
+    } else if ((player.cardOrder%2) == 1){
       for (let i = 0; i < solo.length; i++) {
         var searchCard = solo[i];
         card = player.hand.filter(sortFunction)
-        if (card != "" && card != null && newHand == ""){
+        if(card != "" && newHand.length == ""){
           newHand = card;
-        } else if (card != "" && card != null){
-          newHand.push(card);
+        } else if (card != ""){
+          newHand = newHand.concat(card);
         }
       }
+      // console.log("playerHandBefore " + JSON.stringify(player.hand))
       player.hand = newHand;
+      // console.log("playerHandAfter " + JSON.stringify(player.hand))
     }
     function sortFunction(cV){
       return cV == searchCard;

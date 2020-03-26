@@ -2,7 +2,7 @@ function Room(name){
 	this.players = [];
 	this.tables = [];
 	this.name = name;
-	this.tableLimit = 4;
+	this.tableLimit = 2;
 };
 
 Room.prototype.addPlayer = function(player) {

@@ -7,6 +7,7 @@ function Player(playerID) {
 	this.turnFinished = "";
 	this.trickCards = "";
 	this.currPlayedCard = "";
+	this.trickCardsNo = "";
 	this.cardOrder = 1;
 };
 

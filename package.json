@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "express": "latest",
-    "socket.io": "latest",
-    "node-uuid": "~1.4.1"
+    "jquery": "^3.4.1",
+    "node-uuid": "~1.4.1",
+    "socket.io": "latest"
   }
 }

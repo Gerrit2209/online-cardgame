@@ -159,18 +159,24 @@ io.sockets.on('connection', function (socket) {
     } 
   });
 
-  socket.on("drawCard", function(data) {//Stich nehmen
+  socket.on("takeTrick", function(data) {//Stich nehmen
     console.log("Stich nehmen / drawCard called");
       var player = room.getPlayer(socket.id);
       var table = room.getTable(data.tableID);
           var trickTaken = table.gameObj.takeTrick(table, player);
           if (trickTaken){
-            messaging.sendEventToAllPlayers("logging", {message: player.name + "hat den Stich genommen."}, io, table.players, player);
+            messaging.sendEventToAllPlayers("logging", {message: player.name + "hat den Stich " + table.trickNo + " genommen."}, io, table.players, player);
+            table.trickNo++
+            player.turnFinished = false;
             messaging.sendEventToAllPlayers("turn", {myturn: true}, io, table.players, player);
             messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable}, io, table.players);
           } else {
             messaging.sendEventToAPlayer("logging", {message: "Du kannst den Stich erst bei " + table.playerLimit + " Karten nehmen."}, io, table.players, player);
           }
+          if (table.trickNo == 11){
+            messaging.sendEventToAllPlayers('updateTricksWonByPlayer', {cardsOnTable: table.cardsOnTable}, io, table.players);
+          }
+
   });
 
   socket.on("returnTrick", function(data) {//Stich nehmen
@@ -183,8 +189,9 @@ io.sockets.on('connection', function (socket) {
 
       }
       else {
-        player.turnFinished = false;
-        messaging.sendEventToAllPlayers("logging", {message: player.name + " hat den Stich zurückgegeben."}, io, table.players, player);
+        table.trickNo--
+        player.turnFinished = true;
+        messaging.sendEventToAllPlayers("logging", {message: player.name + " hat den Stich " + table.trickNo + " zurückgegeben."}, io, table.players, player);
         messaging.sendEventToAllPlayers("turn", {myturn: false}, io, table.players, player);
         messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable}, io, table.players);
 }
@@ -197,9 +204,7 @@ io.sockets.on('connection', function (socket) {
       var cardsReturned = table.gameObj.returnCard(table, player);
       if (!cardsReturned){
         messaging.sendEventToAPlayer("logging", {message: "Du kannst keine Karte zurücknehmen"}, io, table.players, player);
-
-      }
-      else {
+      } else {
         player.turnFinished = false;
         messaging.sendEventToAllPlayers("logging", {message: player.name + " hat seine Karte zurückgenommen."}, io, table.players, player);
         messaging.sendEventToAPlayer("turn", {myturn: true}, io, table.players, player);
@@ -273,7 +278,7 @@ io.sockets.on('connection', function (socket) {
           messaging.sendEventToAllPlayersButPlayer("cardInHandCount", {cardsInHand: player.hand.length}, io, table.players, player);
           socket.emit("updateHand", {hand: player.hand});
       } else { //end of turn
-        messaging.sendEventToAPlayer("logging", {message: "Du hast bereits eine Karte gespielt."}, io, table.players, player);
+        messaging.sendEventToAPlayer("logging", {message: "Du hast bereits eine Karte gespielt. CardsOnTable = " + table.cardsOnTable.length}, io, table.players, player);
     }
   });
 

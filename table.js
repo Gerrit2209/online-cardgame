@@ -14,17 +14,18 @@ function Table(tableID){
 	this.players = [];
 	this.playersID = [];
 	this.readyToPlayCounter = 0;
-	this.playerLimit = 4;
+	this.playerLimit = 2;
 	this.pack = [];
 	this.cardsOnTable = [];
+	this.trickNo = 1;
 
-	this.actionCard = false;
-	this.requestActionCard = false;
-	this.penalisingActionCard = false;
-	this.forcedDraw = 0;
+	// this.actionCard = false;
+	// this.requestActionCard = false;
+	// this.penalisingActionCard = false;
+	// this.forcedDraw = 0;
 
-	this.suiteRequest = "";
-	this.numberRequest = "";
+	// this.suiteRequest = "";
+	// this.numberRequest = "";
 
 	this.gameObj = null;
 };
@@ -107,7 +108,7 @@ Table.prototype.isTableAvailable = function() {
 	//return (this.playerLimit > this.players.length);
 };
 
-Table.prototype.createMessageObject = function() {
+/* Table.prototype.createMessageObject = function() {
 	var table = this;
 	var TableMessage = function(){
 		this.id = table.id;
@@ -118,6 +119,6 @@ Table.prototype.createMessageObject = function() {
 	};
 
 	return new TableMessage();
-};
+}; */
 
 module.exports = Table;
