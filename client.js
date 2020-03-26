@@ -1,8 +1,8 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
-  // var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
+  var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 // } else {
-  var socket = io.connect("localhost:5000");
+  // var socket = io.connect("localhost:5000");
 // }
 
 // let port = process.env.PORT;
@@ -88,6 +88,7 @@ socket.on("updateCardsOnTable", function(data){
   //console.log("lastCardOnTable" + data.lastCardOnTable);
   $("#table").text("");
   // if (data.lastCardOnTable == "") {
+  // $("#table").append("<div style='margin-top:2px; margin-left:0px; float: left; z-index:1''><img class='card0' width=100 src=resources/2D.png>");
   if (data.cardsOnTable == "") {
     $("#table").text("");
   } else {
@@ -110,14 +111,62 @@ socket.on("updateCardsOnTable", function(data){
   }
 });
 
-socket.on("updateTricksWonByPlayer", function(data){
+socket.on("updateTricksWonByPlayer", function(data){//XXXXXXXXXXXXXX
   //console.log("lastCardOnTable" + data.lastCardOnTable);
   $("#table").text("");
+  
+  // $("#table").append("<div style='margin-top:2px; margin-left:0px; float: left; z-index:1''><img class='card0' width=100 src=resources/2D.png>");
   // if (data.lastCardOnTable == "") {
-  if (data.cardsOnTable == "") {
-    $("#table").text("");
-  } else {
-    pixel = 0;
+    for (let i = 0; i < data.table.playerLimit; i++) {
+      var a=0;
+      var b=0;
+      var c=0;
+      var d=0;
+      var e=0;
+      var res = "";
+      // const element = array[i];
+    if (data.table.players[i].trickCards == "") {
+      // $("#table").text("");
+    } else {
+      pixel = 0;
+      $.each(data.table.players[i].trickCards, function(k, v) {
+        index = k + 1;
+        $("#table").append("<div style='margin-top:2px; margin-left:" + pixel + "px; float: left; z-index:" + index + "''><img class='card"+k+"' width=80 src=resources/"+v+".png /></div>");
+        // $(".card"+k).click(function() { playCard(k, v); return false; });
+        if (pixel >= 0) {
+          pixel = (pixel + 40) * -1;
+        } else {
+          if (pixel <= -40)
+            pixel = pixel -1;
+          }
+      });
+    }
+    var cardString = data.table.players[i].trickCards.toString();
+    res = cardString.match(/1/g);
+    if (res != null){
+      a=res.length;
+    }
+    res = cardString.match(/2/g);
+    if (res != null){
+      b=res.length;
+    }
+    res = cardString.match(/3/g);
+    if (res != null){
+      c=res.length;
+    }
+    res = cardString.match(/4/g);
+    if (res != null){
+      d=res.length;
+    }
+    res = cardString.match(/5/g);
+    if (res != null){
+      e=res.length;
+    }
+    var punkte = 11*a + 10*b + 2*c + 3*d + 4*e;
+    $("#table").append("<p> " + punkte + " Punkte hat Spieler: " + data.table.players[i].name + "</p><br><br><br><br>");
+
+
+   /*  pixel = 0;    
     $.each(data.cardsOnTable, function(k, v) {
       index = k + 1;
       $("#table").append("<div style='margin-top:2px; margin-left:" + pixel + "px; float: left; z-index:" + index + "''><img class='card"+k+"' width=100 src=resources/"+v+".png /></div>");
@@ -128,7 +177,7 @@ socket.on("updateTricksWonByPlayer", function(data){
         if (pixel <= -40)
           pixel = pixel -1;
         }
-    });
+    }); */
   }
 });
 

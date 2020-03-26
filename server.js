@@ -120,7 +120,8 @@ io.sockets.on('connection', function (socket) {
       var firstCardOnTable = table.cardsOnTable = table.gameObj.playFirstCardToTable(table.pack); //assign first card on table
       table.status = "unavailable"; //set the table status to unavailable
       for (var i = 0; i < table.players.length; i++) { //go through the players array (contains all players sitting at a table)
-        table.players[i].hand = table.gameObj.drawCard(table.pack, 10, "", 1); //assign initial 5 cards to players
+        table.players[i].hand = table.gameObj.drawCard(table.pack, table.maxHandCards, "", 1); //assign initial 5 cards to players
+        // table.players[i].hand = table.gameObj.drawCard(table.pack, 8, "", 1); //assign initial 5 cards to players
         var startingPlayerID = table.playersID[randomNumber]; //get the ID of the randomly selected player who will start
         // if (table.players[i].id === startingPlayerID) { //this player will start the turn
           table.players[i].turnFinished = false;
@@ -165,7 +166,7 @@ io.sockets.on('connection', function (socket) {
       var table = room.getTable(data.tableID);
           var trickTaken = table.gameObj.takeTrick(table, player);
           if (trickTaken){
-            messaging.sendEventToAllPlayers("logging", {message: player.name + "hat den Stich " + table.trickNo + " genommen."}, io, table.players, player);
+            messaging.sendEventToAllPlayers("logging", {message: player.name + " hat den Stich " + table.trickNo + " genommen."}, io, table.players, player);
             table.trickNo++
             player.turnFinished = false;
             messaging.sendEventToAllPlayers("turn", {myturn: true}, io, table.players, player);
@@ -173,8 +174,10 @@ io.sockets.on('connection', function (socket) {
           } else {
             messaging.sendEventToAPlayer("logging", {message: "Du kannst den Stich erst bei " + table.playerLimit + " Karten nehmen."}, io, table.players, player);
           }
-          if (table.trickNo == 11){
-            messaging.sendEventToAllPlayers('updateTricksWonByPlayer', {cardsOnTable: table.cardsOnTable}, io, table.players);
+          console.log("trickNo: " + table.trickNo)
+          if (table.trickNo == (table.maxHandCards+1)){
+            // messaging.sendEventToAllPlayers('updateTricksWonByPlayer', {cardsOnTable: player.trickCards}, io, table.players);
+            messaging.sendEventToAllPlayers('updateTricksWonByPlayer', {table: table}, io, table.players);
           }
 
   });
@@ -269,7 +272,7 @@ io.sockets.on('connection', function (socket) {
           console.log("player.currPlayedCard " + player.currPlayedCard);
           console.log(table.cardsOnTable);
           messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: playedCard}, io, table.players);
-          io.sockets.emit("logging", {message: player.name + " plays a card: " + playedCard});
+          io.sockets.emit("logging", {message: player.name + " spielt die Karte: " + playedCard});
           console.log("CardsOnTable ===> " + JSON.stringify(table.cardsOnTable))
           table.progressRound(player); //end of turn
           //notify frontend
