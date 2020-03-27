@@ -2,11 +2,14 @@
 <html>
   <head>
     <title>Doppelklupf</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Bootstrap -->
-    <link href="components/bootstrap/docs/assets/css/bootstrap.css" rel="stylesheet" media="screen">
+    <link
+      href="components/bootstrap/docs/assets/css/bootstrap.css"
+      rel="stylesheet"
+      media="screen"
+    />
     <style type="text/css">
-
       /* Sticky footer styles
       -------------------------------------------------- */
 
@@ -35,7 +38,7 @@
       }
       #footer {
         background-color: #f5f5f5;
-        overflow:scroll;
+        overflow: scroll;
       }
       #footer #log:before {
         font-size: 36px;
@@ -45,16 +48,15 @@
         margin-left: -230px;
         margin-top: 65px;
         position: fixed;
-
       }
-      </style>
-      <script src="/socket.io/socket.io.js"></script>
-      <script src="components/jquery/jquery.js"></script>
-      <script src="components/bootstrap/docs/assets/js/bootstrap.js"></script>
-      <script src="client.js"></script>
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="components/jquery/jquery.js"></script>
+    <script src="components/bootstrap/docs/assets/js/bootstrap.js"></script>
+    <script src="client.js"></script>
   </head>
   <body>
-  <!-- Part 1: Wrap all page content here -->
+    <!-- Part 1: Wrap all page content here -->
     <div id="wrap">
       <div class="container">
         <div class="page-header">
@@ -62,9 +64,9 @@
         </div>
         <div class="row">
           <!-- <div class="span9"> -->
-            <!-- <p>Hello and welcome to Macaonline. Please have a <a href="#myModal" data-toggle="modal">look at the rules</a> before playing.</p> -->
-            <p align="center">Willkommen beim Doppelklupf</p>
-            <p align="center">Gerrit Kevin Lars Nils Steffen</p>
+          <!-- <p>Hello and welcome to Macaonline. Please have a <a href="#myModal" data-toggle="modal">look at the rules</a> before playing.</p> -->
+          <p align="center">Willkommen beim Doppelklupf</p>
+          <p align="center">Gerrit Kevin Lars Nils Steffen</p>
           <!-- </div> -->
           <div id="counter"></div>
         </div>
@@ -73,9 +75,21 @@
         </div>
         <div id="loginForm">
           <form class="form-inline">
-            <input type="text" class="input" id="name" placeholder="Your name">
-            <input type="text" class="input" id="tableID" placeholder="Choose tableID (any number)">
-            <button type="submit" class="btn btn-success" id="join">Join table</button>
+            <input
+              type="text"
+              class="input"
+              id="name"
+              placeholder="Your name"
+            />
+            <input
+              type="text"
+              class="input"
+              id="tableID"
+              placeholder="Choose tableID (any number)"
+            />
+            <button type="submit" class="btn btn-success" id="join">
+              Join table
+            </button>
             <label id="error"></label>
           </form>
         </div>
@@ -84,29 +98,52 @@
           <ul class="inline">
             <li><p id="progressUpdate"></p></li>
             <li><p id="opponentCardCount"></p></li>
-            <li><p id="numberRequest"><input type="text" id="numberRequestTxt"><button class="btn btn-success" id="numberRequestBtn">OK</button></p></li>
-            <li><p id="suiteRequest"><input type="text" id="suiteRequestTxt" placeholder="suite request"><button class="btn btn-success" id="suiteRequestBtn">OK</button></p></li>
+            <li>
+              <p id="numberRequest">
+                <input type="text" id="numberRequestTxt" /><button
+                  class="btn btn-success"
+                  id="numberRequestBtn"
+                >
+                  OK
+                </button>
+              </p>
+            </li>
+            <li>
+              <p id="suiteRequest">
+                <input
+                  type="text"
+                  id="suiteRequestTxt"
+                  placeholder="suite request"
+                /><button class="btn btn-success" id="suiteRequestBtn">
+                  OK
+                </button>
+              </p>
+            </li>
             <li><p id="pack"></p></li>
           </ul>
         </div>
         <div id="playArea">
           <p id="playOption"></p>
           <button id="takeTrick" class="btn btn-success">Stich nehmen</button>
-          <button id="returnTrick" class="btn btn-success">Stich zurückgeben</button>
-          <button id="returnCard" class="btn btn-success">Karte zurücknehmen</button>
+          <button id="returnTrick" class="btn btn-success">
+            Stich zurückgeben
+          </button>
+          <button id="returnCard" class="btn btn-success">
+            Karte zurücknehmen
+          </button>
           <button id="sortCards" class="btn btn-success">sortieren</button>
           <button id="penalising" class="btn btn-warning">tbd</button>
           <p>Tisch</p>
           <!-- <p>(Discard pile)</p> -->
           <p id="table"></p>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
-          <br>
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
           <p>Hand</p>
           <!-- <p>(Cards in your hand)</p> -->
           <p id="hand"></p>
@@ -116,8 +153,7 @@
 
     <div id="footer">
       <div class="container" id="log">
-        <ul id="updates" class="unstyled">
-        </ul>
+        <ul id="updates" class="unstyled"></ul>
       </div>
     </div>
   </body>
