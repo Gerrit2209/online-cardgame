@@ -14,7 +14,8 @@ function Table(tableID){
 	this.players = [];
 	this.playersID = [];
 	this.readyToPlayCounter = 0;
-	this.playerLimit = 2;
+	this.playerLimitAct = 2;
+	this.playerLimitAll = 3;
 	this.pack = [];
 	this.cardsOnTable = [];
 	this.trickNo = 1;
@@ -75,7 +76,7 @@ Table.prototype.addPlayer = function(player) {
 		}
 		if(!found){
 			this.players.push(player);
-			if(this.players.length == this.playerLimit){
+			if(this.players.length == this.playerLimitAct){
 				//this.status = "playing";
 				for(var i = 0; i < this.players.length; i++){
 					this.players[i].status = "intable";
@@ -101,12 +102,12 @@ Table.prototype.removePlayer = function(player){
 };
 
 Table.prototype.isTableAvailable = function() {
-	if( (this.playerLimit >= this.players.length) && (this.status === "available")) {
+	if( (this.playerLimitAct >= this.players.length) && (this.status === "available")) {
 		return true;
 	} else {
 		return false;
 	}
-	//return (this.playerLimit > this.players.length);
+	//return (this.playerLimitAct > this.players.length);
 };
 
 /* Table.prototype.createMessageObject = function() {
@@ -116,7 +117,7 @@ Table.prototype.isTableAvailable = function() {
 		this.name = table.name;
 		this.status = table.status;
 		this.players = table.players;
-		this.playerLimit = table.playerLimit;
+		this.playerLimitAct = table.playerLimitAct;
 	};
 
 	return new TableMessage();

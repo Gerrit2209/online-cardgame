@@ -78,8 +78,8 @@ io.sockets.on('connection', function (socket) {
       player.status = "intable";
       table.playersID.push(socket.id); //probably not needed
       io.sockets.emit("logging", {message: player.name + " has connected to table: " + table.name + "."});
-      if (table.players.length < table.playerLimit) {
-        io.sockets.emit("logging", {message: "There is " + table.players.length + " player at this table. The table requires " + table.playerLimit + " players to join." });
+      if (table.players.length < table.playerLimitAct) {
+        io.sockets.emit("logging", {message: "There is " + table.players.length + " player at this table. The table requires " + table.playerLimitAct + " active players to join." });
         io.sockets.emit("waiting", {message: "Waiting for other player to join."});
       } else {
         io.sockets.emit("logging", {message: "There are " + table.players.length + " players at this table. Play will commence shortly." });
@@ -117,8 +117,8 @@ io.sockets.on('connection', function (socket) {
     var table = room.getTable(data.tableID);
     player.status = "playing";
     table.readyToPlayCounter++;
-    var randomNumber = Math.floor(Math.random() * table.playerLimit);
-    if (table.readyToPlayCounter === table.playerLimit) {
+    var randomNumber = Math.floor(Math.random() * table.playerLimitAct);
+    if (table.readyToPlayCounter === table.playerLimitAct) {
       var firstCardOnTable = table.cardsOnTable = table.gameObj.playFirstCardToTable(table.pack); //assign first card on table
       table.status = "unavailable"; //set the table status to unavailable
       for (var i = 0; i < table.players.length; i++) { //go through the players array (contains all players sitting at a table)
@@ -152,7 +152,7 @@ io.sockets.on('connection', function (socket) {
   socket.on("disconnect", function() {
     console.log("disconnect called");
     var player = room.getPlayer(socket.id);
-    // if (player && player.status === "intable") { //make sure that player either exists or if player was in table (we don't want to remove players)
+    if (player && player.status === "intable") { //make sure that player either exists or if player was in table (we don't want to remove players)
       //Remove from table
       var table = room.getTable(player.tableID);
       table.removePlayer(player);
@@ -160,7 +160,7 @@ io.sockets.on('connection', function (socket) {
       player.status = "available";
       console.log(player.name + " disconnected");
       io.sockets.emit("logging", {message: player.name + " has left the table."});
-    // } 
+    } 
   });
 
   socket.on("takeTrick", function(data) {//Stich nehmen
@@ -175,7 +175,7 @@ io.sockets.on('connection', function (socket) {
             messaging.sendEventToAllPlayers("turn", {myturn: true}, io, table.players, player);
             messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable}, io, table.players);
           } else {
-            messaging.sendEventToAPlayer("logging", {message: "Du kannst den Stich erst bei " + table.playerLimit + " Karten nehmen."}, io, table.players, player);
+            messaging.sendEventToAPlayer("logging", {message: "Du kannst den Stich erst bei " + table.playerLimitAct + " Karten nehmen."}, io, table.players, player);
           }
           console.log("trickNo: " + table.trickNo)
           if (table.trickNo == (table.maxHandCards+1)){
@@ -242,7 +242,7 @@ io.sockets.on('connection', function (socket) {
       var table = room.getTable(data.tableID);
       // var last = table.gameObj.lastCardOnTable(table.cardsOnTable); //last card on Table
 
-      if (!player.turnFinished && table.cardsOnTable.length != table.playerLimit ) {
+      if (!player.turnFinished && table.cardsOnTable.length != table.playerLimitAct ) {
         var playedCard = data.playedCard;
         var index = data.index; //from client
         var serverIndex = utils.indexOf(player.hand, data.playedCard);

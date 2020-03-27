@@ -51,7 +51,7 @@ Game.prototype._shufflePack = function(pack) {
     var cards = [];
     //return cards;
     cards = table.cardsOnTable;
-    if (cards.length == table.playerLimit){
+    if (cards.length == table.playerLimitAct){
     table.cardsOnTable = "";//.splice(0, 4);
       if (player.trickCards.length > 1) {
         player.trickCards.push.apply(player.trickCards, cards);
@@ -74,7 +74,7 @@ Game.prototype._shufflePack = function(pack) {
 
   Game.prototype.returnTrick = function(table, player) {
     if (table.cardsOnTable.length == ""){
-      table.cardsOnTable=player.trickCards.splice(-table.playerLimit);
+      table.cardsOnTable=player.trickCards.splice(-table.playerLimitAct);
       return true
     } else {
       return false
