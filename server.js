@@ -287,6 +287,7 @@ io.sockets.on("connection", function (socket) {
         // player
       );
       table.trickNo++;
+      table.trickNo.max(table.trickNo, 10);
       player.turnFinished = false;
       messaging.sendEventToAllPlayers(
         "turn",
