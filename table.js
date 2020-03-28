@@ -18,6 +18,7 @@ function Table(tableID) {
   this.pack = [];
   this.cardsOnTable = [];
   this.trickNo = 1;
+  this.roundNo = 1;
   this.maxHandCards = 2;
 
   // this.actionCard = false;

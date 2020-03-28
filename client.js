@@ -3,16 +3,9 @@
 // var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 // } else {
 var socket = io.connect("localhost:5000");
-socket.data = { tableID: 1 };
+// socket.data = { tableID: 1 };
 // var ID = 1; //$("#tableID").val();
 // }
-
-// let port = process.env.PORT;
-// if (port == null || port == "") {//local vs. heroku
-//   port = 8080;
-// }
-// var socket = io.connect("https://stark-taiga-51826.herokuapp.com:" + port);
-// var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 
 $(document).ready(function () {
   $("#tableFull").hide();
@@ -21,7 +14,7 @@ $(document).ready(function () {
   $("#error").hide();
   $("#name").focus();
   $("#progressUpdate").hide();
-  $("#penalising").hide();
+  $("#newRound").hide();
   $("#numberRequest").hide();
   $("#suiteRequest").hide();
   $("form").submit(function (event) {
@@ -36,10 +29,11 @@ $(document).ready(function () {
   //join Button
   $("#join").click(function () {
     var name = $("#name").val();
-    var ID = $("#tableID").val();
+    // var ID = $("#tableID").val();
     if (name.length > 0) {
       socket.emit("connectToServer", { name: name });
-      socket.emit("connectToTable", { tableID: ID });
+      // socket.emit("connectToTable", { tableID: ID });
+      socket.emit("connectToTable");
       $("#loginForm").hide();
       $("#tableFull").hide();
       $("#waiting").show();
@@ -55,26 +49,36 @@ $(document).ready(function () {
   });
   //Stich nehmen
   $("#takeTrick").click(function () {
-    socket.emit("takeTrick", { tableID: socket.data.tableID });
+    socket.emit("takeTrick");
+    // socket.emit("takeTrick", { tableID: socket.tableID });
   });
   //Stich zurückgeben
   $("#returnTrick").click(function () {
-    socket.emit("returnTrick", { tableID: socket.data.tableID });
+    socket.emit("returnTrick");
+    // socket.emit("returnTrick", { tableID: socket.tableID });
   });
   //Karte zurücknehmen
   $("#returnCard").click(function () {
-    socket.emit("returnCard", { tableID: socket.data.tableID });
+    socket.emit("returnCard");
+    // socket.emit("returnCard", { tableID: socket.tableID });
   });
   //sortieren
   $("#sortCards").click(function () {
-    socket.emit("sortCards", { tableID: socket.data.tableID });
+    socket.emit("sortCards");
+    // socket.emit("sortCards", { tableID: socket.tableID });
   });
-  //*penalising card taken button*/
-  $("#penalising").click(function () {
-    socket.emit("penalisingTaken", { tableID: 1 });
-    $("#penalising").hide();
+  //newRound
+  $("#newRound").click(function () {
+    // socket.emit("penalisingTaken", { tableID: 1 });
+    socket.emit("readyToPlay");
+    $("#newRound").hide();
+    $("#playArea").hide();
   });
 });
+
+//
+//*** $-Funktionen beendet ***
+//
 
 //var socket = io.connect("http://ec2-54-229-63-210.eu-west-1.compute.amazonaws.com:8080");
 socket.on("logging", function (data) {
@@ -86,7 +90,8 @@ socket.on("logging", function (data) {
 socket.on("timer", function (data) {
   $("#counter").html(data.countdown);
   if (data.countdown === 0) {
-    socket.emit("readyToPlay", { tableID: 1 });
+    // socket.emit("readyToPlay");
+    socket.emit("readyToPlay", { tableID: socket.tableID });
     $("#counter").hide();
   }
 });
@@ -120,22 +125,30 @@ function playCard(key, value) {
       console.log("called with request ==> " + request);
     });
   } else {*/
-  socket.emit("playCard", { tableID: 1, playedCard: playedCard, index: index });
+  socket.emit("playCard", {
+    // tableID: socket.tableID,
+    playedCard: playedCard,
+    index: index,
+  });
   //}
 }
 
 socket.on("updatePackCount", function (data) {
-  $("#pack").text("");
-  $("#pack").html(
-    "Size of pack is: <span class='label label-info'>" +
-      data.packCount +
-      "</span>"
+  $("#tischNr").text("");
+  $("#tischNr").html(
+    // "Size of pack is: <span class='label label-info'>" +
+    "Tisch Nr.: <span class='label label-info'>" + data.packCount + "</span>"
   );
 });
 
 socket.on("updateCardsOnTable", function (data) {
   //console.log("lastCardOnTable" + data.lastCardOnTable);
   $("#table").text("");
+  $("#stich").text("");
+  $("#stich").html(
+    // "Size of pack is: <span class='label label-info'>" +
+    "Stich: <span class='label label-info'>" + data.trickNo + "</span>"
+  );
   // if (data.lastCardOnTable == "") {
   // $("#table").append("<div style='margin-top:2px; margin-left:0px; float: left; z-index:1''><img class='card0' width=100 src=resources/2D.png>");
   if (data.cardsOnTable == "") {
@@ -167,6 +180,7 @@ socket.on("updateCardsOnTable", function (data) {
 
 socket.on("updateTricksWonByPlayer", function (data) {
   //XXXXXXXXXXXXXX
+  $("#newRound").show();
   $("#table").text("");
   for (let i = 0; i < data.table.playerLimitAct; i++) {
     var a = 0;
@@ -276,7 +290,7 @@ socket.on("turn", function (data) {
       $("#progressUpdate").html(
         "<span class='label label-important'>Noch keine Karte gespielt.</span>"
       );
-      socket.emit("preliminaryRoundCheck", { tableID: 1 }); //When a player has a turn, we need to control a few items, this is what enables us to make it happen.
+      socket.emit("preliminaryRoundCheck", { tableID: socket.tableID }); //When a player has a turn, we need to control a few items, this is what enables us to make it happen.
     } else {
       $("#progressUpdate").html(
         "<span class='label label-info'>Du hast bereits eine Karte gespielt.</span>"
@@ -285,24 +299,32 @@ socket.on("turn", function (data) {
   }
 });
 
-socket.on("cardInHandCount", function (data) {
-  var spanClass = "badge-success";
-  var plural = "s";
-  if (data.cardsInHand <= 2) {
-    spanClass = "badge-important";
-  }
-  if (data.cardsInHand <= 1) {
-    plural = "";
-  }
-  $("#opponentCardCount").html(
-    "Your opponent has <span class='badge " +
-      spanClass +
-      "''>" +
-      data.cardsInHand +
-      "</span> card" +
-      plural +
-      " in hand."
+socket.on("showTrickNo", function (data) {
+  // var spanClass = "badge-success";
+  // var plural = "s";
+  // if (data.cardsInHand <= 2) {
+  //   spanClass = "badge-important";
+  // }
+  // if (data.cardsInHand <= 1) {
+  //   plural = "";
+  // }
+  $("#runde").html(
+    // "Runde (tbd) <span class='badge " +
+    "Runde: <span class='label label-info'>" +
+      // spanClass +
+      // "''>" +
+      data.roundNo +
+      "</span>"
   );
+  // $("#opponentCardCount").html(
+  //   "Your opponent has <span class='badge " +
+  //     spanClass +
+  //     "''>" +
+  //     data.cardsInHand +
+  //     "</span> card" +
+  //     plural +
+  //     " in hand."
+  // );
 });
 
 socket.on("tableFull", function () {

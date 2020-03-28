@@ -73,13 +73,19 @@ io.sockets.on("connection", function (socket) {
     - send a time counter of 3 seconds to both connected clients
     - after the 3 second delay, emit a 'PLAY' message
   */
-  socket.on("connectToTable", function (data) {
+  socket.on("connectToTable", function () {
     //direkt nach "join"-Button
     var player = room.getPlayer(socket.id);
-    var table = room.getTable(data.tableID);
+    for (let i = 0; i < room.tableLimit; i++) {
+      var table = room.getTable(i);
+      if (table.status == "available") {
+        socket.tableID = i;
+        break;
+      }
+    }
     console.log(
       "connectToTable called. tableID:" +
-        data.tableID +
+        socket.tableID +
         " & table.status: " +
         table.status
     );
@@ -87,34 +93,59 @@ io.sockets.on("connection", function (socket) {
       player.tableID = table.id;
       player.status = "intable";
       table.playersID.push(socket.id); //probably not needed
-      io.sockets.emit("logging", {
-        message: player.name + " has connected to table: " + table.name + ".",
-      });
+      messaging.sendEventToAllPlayers(
+        "logging",
+        {
+          message: player.name + " has connected to table: " + table.name + ".",
+        },
+        io,
+        table.players
+      );
       if (table.players.length < table.playerLimitAct) {
-        io.sockets.emit("logging", {
-          message:
-            "There is " +
-            table.players.length +
-            " player at this table. The table requires " +
-            table.playerLimitAct +
-            " active players to join.",
-        });
-        io.sockets.emit("waiting", {
-          message: "Waiting for other player to join.",
-        });
+        messaging.sendEventToAllPlayers(
+          "logging",
+          {
+            message:
+              "There is " +
+              table.players.length +
+              " player at this table. The table requires " +
+              table.playerLimitAct +
+              " active players to join.",
+          },
+          io,
+          table.players
+        );
+        messaging.sendEventToAllPlayers(
+          "waiting",
+          {
+            message: "Waiting for other player to join.",
+          },
+          io,
+          table.players
+        );
       } else {
-        io.sockets.emit("logging", {
-          message:
-            "There are " +
-            table.players.length +
-            " players at this table. Play will commence shortly.",
-        });
+        messaging.sendEventToAllPlayers(
+          "logging",
+          {
+            message:
+              "There are " +
+              table.players.length +
+              " players at this table. Play will commence shortly.",
+          },
+          io,
+          table.players
+        );
         //emit counter
         var countdown = 1; //3 seconds in reality...
         console.log("3 sec timer starting...");
         setInterval(function () {
           countdown--;
-          io.sockets.emit("timer", { countdown: countdown });
+          messaging.sendEventToAllPlayers(
+            "timer",
+            { countdown: countdown },
+            io,
+            table.players
+          );
         }, 1000);
       }
     } else {
@@ -124,6 +155,11 @@ io.sockets.on("connection", function (socket) {
     }
   });
 
+  socket.on("newRound", function (data) {
+    console.log("Ready to play called");
+    var player = room.getPlayer(socket.id);
+    var table = room.getTable(socket.tableID);
+  });
   /*
   Once the counter has finished both clients will emit a "readyToPlay" message
   Upon the receival of this message, we check against a local variable (never trust data from the client) and
@@ -140,14 +176,20 @@ io.sockets.on("connection", function (socket) {
   socket.on("readyToPlay", function (data) {
     console.log("Ready to play called");
     var player = room.getPlayer(socket.id);
-    var table = room.getTable(data.tableID);
+    var table = room.getTable(socket.tableID);
+    //reset, nur in neuer Runde, nicht initial
+    player.turnFinished = "";
+    player.trickCards = "";
+    player.currPlayedCard = "";
+    player.trickCardsNo = "";
+    player.cardOrder = 1;
+    table.trickNo = 1;
+    //Initial & jede neue Runde
     player.status = "playing";
     table.readyToPlayCounter++;
     var randomNumber = Math.floor(Math.random() * table.playerLimitAct);
     if (table.readyToPlayCounter === table.playerLimitAct) {
-      var firstCardOnTable = (table.cardsOnTable = table.gameObj.playFirstCardToTable(
-        table.pack
-      )); //assign first card on table
+      table.cardsOnTable = table.gameObj.playFirstCardToTable(table.pack); //assign first card on table
       table.status = "unavailable"; //set the table status to unavailable
       for (var i = 0; i < table.players.length; i++) {
         //go through the players array (contains all players sitting at a table)
@@ -167,8 +209,8 @@ io.sockets.on("connection", function (socket) {
         }); //send the cards in hands to player
         io.sockets.sockets[table.players[i].id].emit("turn", { myturn: true }); //send the turn-signal to player
         io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
-        io.sockets.sockets[table.players[i].id].emit("cardInHandCount", {
-          cardsInHand: table.players[i].hand.length,
+        io.sockets.sockets[table.players[i].id].emit("showTrickNo", {
+          roundNo: table.roundNo,
         });
         // } else {
         //   table.players[i].turnFinished = true;
@@ -176,13 +218,17 @@ io.sockets.on("connection", function (socket) {
         //   io.sockets.sockets[table.players[i].id].emit("updateHand", { hand: table.players[i].hand }); //send the card in hands to player
         //   io.sockets.sockets[table.players[i].id].emit("turn", { myturn: false }); //send the turn-signal to player
         //   io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
-        //   io.sockets.sockets[table.players[i].id].emit("cardInHandCount", {cardsInHand: table.players[i].hand.length});
+        //   io.sockets.sockets[table.players[i].id].emit("showTrickNo", {cardsInHand: table.players[i].hand.length});
         // }
       }
       //sends the cards to the table.
       messaging.sendEventToAllPlayers(
         "updateCardsOnTable",
-        { cardsOnTable: table.cardsOnTable, lastCardOnTable: "" },
+        {
+          cardsOnTable: table.cardsOnTable,
+          lastCardOnTable: "",
+          trickNo: table.trickNo,
+        },
         io,
         table.players
       );
@@ -190,7 +236,13 @@ io.sockets.on("connection", function (socket) {
         "CardsOnTable at readyToPlay ===> " + JSON.stringify(table.cardsOnTable)
       );
       //messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: table.cardsOnTable}, io, table.players);
-      io.sockets.emit("updatePackCount", { packCount: table.pack.length });
+      // io.sockets.emit("updatePackCount", { packCount: table.pack.length });
+      messaging.sendEventToAllPlayers(
+        "updatePackCount",
+        { packCount: socket.tableID },
+        io,
+        table.players
+      );
     }
   });
 
@@ -198,6 +250,12 @@ io.sockets.on("connection", function (socket) {
     console.log("disconnect called");
     var player = room.getPlayer(socket.id);
     if (player && player.status === "intable") {
+      console.log(
+        "player was in table. player: " +
+          player +
+          ". player.status: " +
+          player.status
+      );
       //make sure that player either exists or if player was in table (we don't want to remove players)
       //Remove from table
       var table = room.getTable(player.tableID);
@@ -211,11 +269,11 @@ io.sockets.on("connection", function (socket) {
     }
   });
 
-  socket.on("takeTrick", function (data) {
+  socket.on("takeTrick", function () {
     //Stich nehmen
     console.log("Stich nehmen / drawCard called");
     var player = room.getPlayer(socket.id);
-    var table = room.getTable(data.tableID);
+    var table = room.getTable(socket.tableID);
     var trickTaken = table.gameObj.takeTrick(table, player);
     if (trickTaken) {
       messaging.sendEventToAllPlayers(
@@ -225,8 +283,8 @@ io.sockets.on("connection", function (socket) {
             player.name + " hat den Stich " + table.trickNo + " genommen.",
         },
         io,
-        table.players,
-        player
+        table.players
+        // player
       );
       table.trickNo++;
       player.turnFinished = false;
@@ -234,12 +292,12 @@ io.sockets.on("connection", function (socket) {
         "turn",
         { myturn: true },
         io,
-        table.players,
-        player
+        table.players
+        // player
       );
       messaging.sendEventToAllPlayers(
         "updateCardsOnTable",
-        { cardsOnTable: table.cardsOnTable },
+        { cardsOnTable: table.cardsOnTable, trickNo: table.trickNo },
         io,
         table.players
       );
@@ -260,6 +318,8 @@ io.sockets.on("connection", function (socket) {
     console.log("trickNo: " + table.trickNo);
     if (table.trickNo == table.maxHandCards + 1) {
       // messaging.sendEventToAllPlayers('updateTricksWonByPlayer', {cardsOnTable: player.trickCards}, io, table.players);
+      table.readyToPlayCounter = 0; //reset readytoPlayCounter
+      table.roundNo++; // hochzählen
       messaging.sendEventToAllPlayers(
         "updateTricksWonByPlayer",
         { table: table },
@@ -269,11 +329,11 @@ io.sockets.on("connection", function (socket) {
     }
   });
 
-  socket.on("returnTrick", function (data) {
+  socket.on("returnTrick", function () {
     //Stich nehmen
     console.log("Stich zurückgeben / returnTrick called");
     var player = room.getPlayer(socket.id);
-    var table = room.getTable(data.tableID);
+    var table = room.getTable(socket.tableID);
     var trickReturned = table.gameObj.returnTrick(table, player);
     if (!trickReturned) {
       messaging.sendEventToAPlayer(
@@ -293,30 +353,30 @@ io.sockets.on("connection", function (socket) {
             player.name + " hat den Stich " + table.trickNo + " zurückgegeben.",
         },
         io,
-        table.players,
-        player
+        table.players
+        // player
       );
       messaging.sendEventToAllPlayers(
         "turn",
         { myturn: false },
         io,
-        table.players,
-        player
+        table.players
+        // player
       );
       messaging.sendEventToAllPlayers(
         "updateCardsOnTable",
-        { cardsOnTable: table.cardsOnTable },
+        { cardsOnTable: table.cardsOnTable, trickNo: table.trickNo },
         io,
         table.players
       );
     }
   });
 
-  socket.on("returnCard", function (data) {
+  socket.on("returnCard", function () {
     //Stich nehmen
     console.log("Karte zurückgeben / returnCard called");
     var player = room.getPlayer(socket.id);
-    var table = room.getTable(data.tableID);
+    var table = room.getTable(socket.tableID);
     var cardsReturned = table.gameObj.returnCard(table, player);
     if (!cardsReturned) {
       messaging.sendEventToAPlayer(
@@ -332,8 +392,8 @@ io.sockets.on("connection", function (socket) {
         "logging",
         { message: player.name + " hat seine Karte zurückgenommen." },
         io,
-        table.players,
-        player
+        table.players
+        // player
       );
       messaging.sendEventToAPlayer(
         "turn",
@@ -344,7 +404,7 @@ io.sockets.on("connection", function (socket) {
       );
       messaging.sendEventToAllPlayers(
         "updateCardsOnTable",
-        { cardsOnTable: table.cardsOnTable },
+        { cardsOnTable: table.cardsOnTable, trickNo: table.trickNo },
         io,
         table.players
       );
@@ -359,10 +419,10 @@ io.sockets.on("connection", function (socket) {
     }
   });
 
-  socket.on("sortCards", function (data) {
+  socket.on("sortCards", function () {
     console.log("sortieren / sortCards called");
     var player = room.getPlayer(socket.id);
-    var table = room.getTable(data.tableID);
+    var table = room.getTable(socket.tableID);
     var cardsReturned = table.gameObj.sortCards(table, player);
     messaging.sendEventToAPlayer(
       "updateHand",
@@ -384,7 +444,7 @@ io.sockets.on("connection", function (socket) {
       */
     var errorFlag = false;
     var player = room.getPlayer(socket.id);
-    var table = room.getTable(data.tableID);
+    var table = room.getTable(socket.tableID);
     // var last = table.gameObj.lastCardOnTable(table.cardsOnTable); //last card on Table
 
     if (
@@ -435,13 +495,22 @@ io.sockets.on("connection", function (socket) {
       console.log(table.cardsOnTable);
       messaging.sendEventToAllPlayers(
         "updateCardsOnTable",
-        { cardsOnTable: table.cardsOnTable, lastCardOnTable: playedCard },
+        {
+          cardsOnTable: table.cardsOnTable,
+          lastCardOnTable: playedCard,
+          trickNo: table.trickNo,
+        },
         io,
         table.players
       );
-      io.sockets.emit("logging", {
-        message: player.name + " spielt die Karte: " + playedCard,
-      });
+      messaging.sendEventToAllPlayers(
+        "logging",
+        {
+          message: player.name + " spielt die Karte: " + playedCard,
+        },
+        io,
+        table.players
+      );
       console.log("CardsOnTable ===> " + JSON.stringify(table.cardsOnTable));
       table.progressRound(player); //end of turn
       //notify frontend
@@ -453,12 +522,13 @@ io.sockets.on("connection", function (socket) {
         player
       );
       //messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
-      messaging.sendEventToAllPlayersButPlayer(
-        "cardInHandCount",
-        { cardsInHand: player.hand.length },
+      // messaging.sendEventToAllPlayersButPlayer(
+      messaging.sendEventToAllPlayers(
+        "showTrickNo",
+        { roundNo: table.roundNo },
         io,
-        table.players,
-        player
+        table.players
+        // player
       );
       socket.emit("updateHand", { hand: player.hand });
     } else {
