@@ -138,8 +138,7 @@ socket.on("updatePackCount", function (data) {
   $("#tischNr").html(
     // "Size of pack is: <span class='label label-info'>" +
     "Tisch Nr.: <span class='label label-info'>" +
-      data.packCount +
-      1 +
+      (data.packCount + 1) +
       "</span>"
   );
 });

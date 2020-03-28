@@ -13,8 +13,8 @@ function Table(tableID) {
   this.players = [];
   this.playersID = [];
   this.readyToPlayCounter = 0;
-  this.playerLimitAct = 2;
-  this.playerLimitAll = 3;
+  this.playerLimitAct = 4;
+  this.playerLimitAll = 5;
   this.pack = [];
   this.cardsOnTable = [];
   this.trickNo = 1;
