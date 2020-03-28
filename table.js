@@ -19,7 +19,7 @@ function Table(tableID) {
   this.cardsOnTable = [];
   this.trickNo = 1;
   this.roundNo = 1;
-  this.maxHandCards = 2;
+  this.maxHandCards = 10;
 
   // this.actionCard = false;
   // this.requestActionCard = false;
