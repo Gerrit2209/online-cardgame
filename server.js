@@ -184,6 +184,9 @@ io.sockets.on("connection", function (socket) {
     player.trickCardsNo = "";
     player.cardOrder = 1;
     table.trickNo = 1;
+    table.trickCards = {};
+    table.trickTakenBy = {};
+    table.seeLastTrickCounter = 0;
     //Initial & jede neue Runde
     player.status = "playing";
     table.readyToPlayCounter++;
@@ -274,7 +277,7 @@ io.sockets.on("connection", function (socket) {
     console.log("Stich nehmen called");
     var player = room.getPlayer(socket.id);
     var table = room.getTable(socket.tableID);
-    console.log("trickNo: " + table.trickNo + 1);
+    console.log("Stich genommen - trickNo: " + table.trickNo);
     var trickTaken = table.gameObj.takeTrick(table, player);
     if (trickTaken) {
       if (table.trickNo == table.maxHandCards) {
@@ -306,21 +309,26 @@ io.sockets.on("connection", function (socket) {
         table.players
         // player
       );
-      if (table.trickNo != table.maxHandCards) {
+      table.trickNo++;
+      // table.trickNo = Math.min(table.trickNo, table.playerLimitAct);
+      if (table.trickNo != table.maxHandCards + 1) {
+        var stich = Math.min(table.trickNo, table.maxHandCards); //obergrenze Stichanzahls-Anzeige
         messaging.sendEventToAllPlayers(
           "updateCardsOnTable",
-          { cardsOnTable: table.cardsOnTable, trickNo: table.trickNo },
+          {
+            cardsOnTable: table.cardsOnTable,
+            trickNo: stich,
+          },
           io,
           table.players
         );
-        messaging.sendEventToAllPlayers(
-          "updateLastTrick",
-          { table: table, name: player.name },
-          io,
-          table.players
-        );
+        // messaging.sendEventToAllPlayers(
+        //   "updateLastTrick",
+        //   { table: table, name: player.name },
+        //   io,
+        //   table.players
+        // );
       }
-      table.trickNo++;
     } else {
       messaging.sendEventToAPlayer(
         "logging",
@@ -352,10 +360,13 @@ io.sockets.on("connection", function (socket) {
         player
       );
     } else {
-      if (table.trickNo != table.maxHandCards) {
-        //Nur nicht in der letzten Runde
-        table.trickNo--;
+      // if (table.trickNo != table.maxHandCards + 1) {
+      //Nur nicht in der letzten Runde
+      table.trickNo--;
+      if (table.trickNo == table.maxHandCards) {
+        table.roundNo--; // hochzählen
       }
+      // }
       player.turnFinished = true;
       messaging.sendEventToAllPlayers(
         "logging",
@@ -444,6 +455,23 @@ io.sockets.on("connection", function (socket) {
     );
   });
 
+  socket.on("seeLastTrick", function () {
+    console.log("seeLastTrick called");
+    var player = room.getPlayer(socket.id);
+    var table = room.getTable(socket.tableID);
+    table.seeLastTrickCounter++;
+    if (table.trickNo > 1) {
+      console.log("seeLastTrick called if-cond");
+      // var cardsReturned = table.gameObj.sortCards(table, player);
+      messaging.sendEventToAllPlayers(
+        "updateLastTrick",
+        { table: table, name: player.name },
+        io,
+        table.players
+      );
+    }
+  });
+
   socket.on("playCard", function (data) {
     console.log("playCard called");
     /*
@@ -471,18 +499,18 @@ io.sockets.on("connection", function (socket) {
 
       if (index == serverIndex) {
         errorFlag = false;
-      } else {
-        errorFlag = true;
-        playedCard = null;
-        messaging.sendEventToAPlayer(
-          "logging",
-          { message: "Index mismatch - you have altered with the code." },
-          io,
-          table.players,
-          player
-        );
-        socket.emit("updateHand", { hand: player.hand });
-      }
+      } //else {
+      //   errorFlag = true;
+      //   playedCard = null;
+      //   messaging.sendEventToAPlayer(
+      //     "logging",
+      //     { message: "Index mismatch - you have altered with the code." },
+      //     io,
+      //     table.players,
+      //     player
+      //   );
+      //   socket.emit("updateHand", { hand: player.hand });
+      // }
 
       if (utils.indexOf(player.hand, data.playedCard) > -1) {
         errorFlag = false;
@@ -518,7 +546,7 @@ io.sockets.on("connection", function (socket) {
         "logging",
         {
           // message: player.name + " spielt: " + playedCard
-          message: player.name + " spielt: " + table.cardUnicode[playedCard],
+          message: table.cardUnicode[playedCard] + " - " + player.name,
         },
         io,
         table.players

@@ -59,6 +59,7 @@ Game.prototype.takeTrick = function (table, player) {
   cards = table.cardsOnTable;
   if (cards.length == table.playerLimitAct) {
     table.trickCards[table.trickNo] = cards;
+    table.trickTakenBy[table.trickNo] = player;
     // table.trickCards.push(cards);
     console.log("table.TrickCards: " + table.trickCards[table.trickNo]);
     table.cardsOnTable = ""; //.splice(0, 4);

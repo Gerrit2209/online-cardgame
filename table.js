@@ -19,8 +19,10 @@ function Table(tableID) {
   this.cardsOnTable = [];
   this.trickNo = 1;
   this.trickCards = {};
+  this.trickTakenBy = {};
+  this.seeLastTrickCounter = 0;
   this.roundNo = 1;
-  this.maxHandCards = 10;
+  this.maxHandCards = 3;
   this.cardUnicode = "";
 
   this.cardUnicode = {

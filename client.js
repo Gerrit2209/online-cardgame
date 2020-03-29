@@ -1,8 +1,8 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
-var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
+// var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 // } else {
-// var socket = io.connect("localhost:5000");
+var socket = io.connect("localhost:5000");
 // socket.data = { tableID: 1 };
 // var ID = 1; //$("#tableID").val();
 // }
@@ -66,6 +66,11 @@ $(document).ready(function () {
   //sortieren
   $("#sortCards").click(function () {
     socket.emit("sortCards");
+    // socket.emit("sortCards", { tableID: socket.tableID });
+  });
+  //seeLastTrick
+  $("#seeLastTrick").click(function () {
+    socket.emit("seeLastTrick");
     // socket.emit("sortCards", { tableID: socket.tableID });
   });
   //newRound
@@ -147,6 +152,7 @@ socket.on("updateCardsOnTable", function (data) {
   //console.log("lastCardOnTable" + data.lastCardOnTable);
   $("#table").text("");
   $("#stich").text("");
+  // var stich = Math.min(data.trickNo, data.table.maxHandCards);
   $("#stich").html(
     "Stich: <span class='label label-info'>" + data.trickNo + "</span>"
   );
@@ -180,40 +186,53 @@ socket.on("updateCardsOnTable", function (data) {
 });
 
 socket.on("updateLastTrick", function (data) {
-  $("#lastTrick").show;
-  $("#lastTrickName").text(data.name + " nahm den letzten Stich:");
-  $("#lastTrick").text("");
-  // JSON.stringify(data.table.lastTrick[data.table.trickNo])
-  // );
-  // $("#stich").html(
-  //   "Stich: <span class='label label-info'>" + data.trickNo + "</span>"
-  // );
-  // if (data.lastCardOnTable == "") {
-  // $("#table").append("<div style='margin-top:2px; margin-left:0px; float: left; z-index:1''><img class='card0' width=100 src=resources/2D.png>");
-  if (data.table.trickCards[data.table.trickNo] == "") {
-    $("#lastTrick").text("Leer");
+  if (data.table.seeLastTrickCounter % 2 == 0) {
+    $("#lastTrick").hide();
+    $("#lastTrickName").hide();
   } else {
-    pixel = 0;
-    $.each(data.table.trickCards[data.table.trickNo], function (k, v) {
-      index = k + 1;
-      $("#lastTrick").append(
-        "<div style='margin-top:2px; margin-left:" +
-          pixel +
-          "px; float: left; z-index:" +
-          index +
-          "''><img class='card" +
-          k +
-          "' width=100 src=resources/" +
-          v +
-          ".png /></div>"
-      );
-      // $(".card"+k).click(function() { playCard(k, v); return false; });
-      if (pixel >= 0) {
-        pixel = (pixel + 40) * -1;
-      } else {
-        if (pixel <= -40) pixel = pixel - 1;
-      }
-    });
+    $("#lastTrick").show();
+    $("#lastTrickName").show();
+    $("#lastTrickName").text(
+      data.name +
+        " deckt den letzten Stich um (wurde gewonnen von " +
+        data.table.trickTakenBy[data.table.trickNo - 1].name +
+        "):"
+      // " nahm den letzten Stich:"
+      // data.table.trickTakenBy[data.table.trickNo-1] + " nahm den letzten Stich:"
+    );
+    $("#lastTrick").text("");
+    // JSON.stringify(data.table.lastTrick[data.table.trickNo])
+    // );
+    // $("#stich").html(
+    //   "Stich: <span class='label label-info'>" + data.trickNo + "</span>"
+    // );
+    // if (data.lastCardOnTable == "") {
+    // $("#table").append("<div style='margin-top:2px; margin-left:0px; float: left; z-index:1''><img class='card0' width=100 src=resources/2D.png>");
+    if (data.table.trickCards[data.table.trickNo - 1] == "") {
+      $("#lastTrick").text("Leer");
+    } else {
+      pixel = 0;
+      $.each(data.table.trickCards[data.table.trickNo - 1], function (k, v) {
+        index = k + 1;
+        $("#lastTrick").append(
+          "<div style='margin-top:2px; margin-left:" +
+            pixel +
+            "px; float: left; z-index:" +
+            index +
+            "''><img class='card" +
+            k +
+            "' width=100 src=resources/" +
+            v +
+            ".png /></div>"
+        );
+        // $(".card"+k).click(function() { playCard(k, v); return false; });
+        if (pixel >= 0) {
+          pixel = (pixel + 40) * -1;
+        } else {
+          if (pixel <= -40) pixel = pixel - 1;
+        }
+      });
+    }
   }
 });
 
@@ -285,8 +304,8 @@ socket.on("updateTricksWonByPlayer", function (data) {
     if (res != null) {
       e = res.length;
     }
-    // var punkte = 11 * a + 10 * b + 2 * c + 3 * d + 4 * e;
-    var punkte = 10;
+    var punkte = 11 * a + 10 * b + 2 * c + 3 * d + 4 * e;
+    // var punkte = 10;
     $("#table").append(
       "<p> " +
         punkte +
