@@ -22,7 +22,7 @@ function Table(tableID) {
   this.trickTakenBy = {};
   this.seeLastTrickCounter = 0;
   this.roundNo = 1;
-  this.maxHandCards = 3;
+  this.maxHandCards = 10;
   this.cardUnicode = "";
 
   this.cardUnicode = {
