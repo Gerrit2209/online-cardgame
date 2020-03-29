@@ -51,7 +51,7 @@ Messaging.prototype.createSampleTables = function (amount) {
     var game = new Game();
     //var table = new Table(uuid.v4());
     var table = new Table(i);
-    table.setName("Dokotisch " + i + 1);
+    table.setName("Dokotisch " + (i + 1));
     table.gameObj = game;
     table.pack = game.pack; //adds the shuffled pack from the constructor
     table.status = "available";

@@ -271,23 +271,33 @@ io.sockets.on("connection", function (socket) {
 
   socket.on("takeTrick", function () {
     //Stich nehmen
-    console.log("Stich nehmen / drawCard called");
+    console.log("Stich nehmen called");
     var player = room.getPlayer(socket.id);
     var table = room.getTable(socket.tableID);
+    console.log("trickNo: " + table.trickNo + 1);
     var trickTaken = table.gameObj.takeTrick(table, player);
     if (trickTaken) {
+      if (table.trickNo == table.maxHandCards) {
+        // messaging.sendEventToAllPlayers('updateTricksWonByPlayer', {cardsOnTable: player.trickCards}, io, table.players);
+        table.readyToPlayCounter = 0; //reset readytoPlayCounter
+        table.roundNo++; // hochzählen
+        messaging.sendEventToAllPlayers(
+          "updateTricksWonByPlayer",
+          { table: table },
+          io,
+          table.players
+        );
+      }
       messaging.sendEventToAllPlayers(
         "logging",
         {
-          message:
-            player.name + " hat den Stich " + table.trickNo + " genommen.",
+          message: player.name + " nimmt Stich " + table.trickNo + "",
         },
         io,
         table.players
         // player
       );
-      table.trickNo++;
-      table.trickNo.max(table.trickNo, 10);
+      // table.trickNo = Math.min(table.trickNo, table.maxHandCards);
       player.turnFinished = false;
       messaging.sendEventToAllPlayers(
         "turn",
@@ -296,12 +306,21 @@ io.sockets.on("connection", function (socket) {
         table.players
         // player
       );
-      messaging.sendEventToAllPlayers(
-        "updateCardsOnTable",
-        { cardsOnTable: table.cardsOnTable, trickNo: table.trickNo },
-        io,
-        table.players
-      );
+      if (table.trickNo != table.maxHandCards) {
+        messaging.sendEventToAllPlayers(
+          "updateCardsOnTable",
+          { cardsOnTable: table.cardsOnTable, trickNo: table.trickNo },
+          io,
+          table.players
+        );
+        messaging.sendEventToAllPlayers(
+          "updateLastTrick",
+          { table: table, name: player.name },
+          io,
+          table.players
+        );
+      }
+      table.trickNo++;
     } else {
       messaging.sendEventToAPlayer(
         "logging",
@@ -314,18 +333,6 @@ io.sockets.on("connection", function (socket) {
         io,
         table.players,
         player
-      );
-    }
-    console.log("trickNo: " + table.trickNo);
-    if (table.trickNo == table.maxHandCards + 1) {
-      // messaging.sendEventToAllPlayers('updateTricksWonByPlayer', {cardsOnTable: player.trickCards}, io, table.players);
-      table.readyToPlayCounter = 0; //reset readytoPlayCounter
-      table.roundNo++; // hochzählen
-      messaging.sendEventToAllPlayers(
-        "updateTricksWonByPlayer",
-        { table: table },
-        io,
-        table.players
       );
     }
   });
@@ -345,7 +352,10 @@ io.sockets.on("connection", function (socket) {
         player
       );
     } else {
-      table.trickNo--;
+      if (table.trickNo != table.maxHandCards) {
+        //Nur nicht in der letzten Runde
+        table.trickNo--;
+      }
       player.turnFinished = true;
       messaging.sendEventToAllPlayers(
         "logging",
@@ -507,7 +517,8 @@ io.sockets.on("connection", function (socket) {
       messaging.sendEventToAllPlayers(
         "logging",
         {
-          message: player.name + " spielt die Karte: " + playedCard,
+          // message: player.name + " spielt: " + playedCard
+          message: player.name + " spielt: " + table.cardUnicode[playedCard],
         },
         io,
         table.players

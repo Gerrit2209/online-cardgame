@@ -17,6 +17,7 @@ $(document).ready(function () {
   $("#newRound").hide();
   $("#numberRequest").hide();
   $("#suiteRequest").hide();
+  $("#tableID").hide();
   $("form").submit(function (event) {
     event.preventDefault();
   });
@@ -136,7 +137,6 @@ function playCard(key, value) {
 socket.on("updatePackCount", function (data) {
   $("#tischNr").text("");
   $("#tischNr").html(
-    // "Size of pack is: <span class='label label-info'>" +
     "Tisch Nr.: <span class='label label-info'>" +
       (data.packCount + 1) +
       "</span>"
@@ -148,7 +148,6 @@ socket.on("updateCardsOnTable", function (data) {
   $("#table").text("");
   $("#stich").text("");
   $("#stich").html(
-    // "Size of pack is: <span class='label label-info'>" +
     "Stich: <span class='label label-info'>" + data.trickNo + "</span>"
   );
   // if (data.lastCardOnTable == "") {
@@ -180,10 +179,55 @@ socket.on("updateCardsOnTable", function (data) {
   }
 });
 
+socket.on("updateLastTrick", function (data) {
+  $("#lastTrick").show;
+  $("#lastTrickName").text(data.name + " nahm den letzten Stich:");
+  $("#lastTrick").text("");
+  // JSON.stringify(data.table.lastTrick[data.table.trickNo])
+  // );
+  // $("#stich").html(
+  //   "Stich: <span class='label label-info'>" + data.trickNo + "</span>"
+  // );
+  // if (data.lastCardOnTable == "") {
+  // $("#table").append("<div style='margin-top:2px; margin-left:0px; float: left; z-index:1''><img class='card0' width=100 src=resources/2D.png>");
+  if (data.table.trickCards[data.table.trickNo] == "") {
+    $("#lastTrick").text("Leer");
+  } else {
+    pixel = 0;
+    $.each(data.table.trickCards[data.table.trickNo], function (k, v) {
+      index = k + 1;
+      $("#lastTrick").append(
+        "<div style='margin-top:2px; margin-left:" +
+          pixel +
+          "px; float: left; z-index:" +
+          index +
+          "''><img class='card" +
+          k +
+          "' width=100 src=resources/" +
+          v +
+          ".png /></div>"
+      );
+      // $(".card"+k).click(function() { playCard(k, v); return false; });
+      if (pixel >= 0) {
+        pixel = (pixel + 40) * -1;
+      } else {
+        if (pixel <= -40) pixel = pixel - 1;
+      }
+    });
+  }
+});
+
 socket.on("updateTricksWonByPlayer", function (data) {
   //XXXXXXXXXXXXXX
+  // data.table.trickNo++;
+  $("#lastTrick").hide();
+  $("#lastTrickName").hide();
   $("#newRound").show();
   $("#table").text("");
+  // $("#table").append(
+  //   "<div style='margin-top:2px; margin-left:0px; float: left; z-index:1' '=''><img class='card0' width='100' src='resources/4C.png'></div>"
+  // );
+  // $("#table").text("<p> Test </p>");
   for (let i = 0; i < data.table.playerLimitAct; i++) {
     var a = 0;
     var b = 0;
@@ -207,10 +251,16 @@ socket.on("updateTricksWonByPlayer", function (data) {
             v +
             ".png /></div>"
         );
+        if (index % data.table.playerLimitAct == 1) {
+          pixel = pixel - 45;
+        }
         if (pixel >= 0) {
           pixel = (pixel + 40) * -1;
         } else {
           if (pixel <= -40) pixel = pixel - 1;
+          if (index % data.table.playerLimitAct == 0) {
+            pixel = pixel + 45;
+          }
         }
       });
     }
@@ -235,7 +285,8 @@ socket.on("updateTricksWonByPlayer", function (data) {
     if (res != null) {
       e = res.length;
     }
-    var punkte = 11 * a + 10 * b + 2 * c + 3 * d + 4 * e;
+    // var punkte = 11 * a + 10 * b + 2 * c + 3 * d + 4 * e;
+    var punkte = 10;
     $("#table").append(
       "<p> " +
         punkte +

@@ -18,8 +18,33 @@ function Table(tableID) {
   this.pack = [];
   this.cardsOnTable = [];
   this.trickNo = 1;
+  this.trickCards = {};
   this.roundNo = 1;
   this.maxHandCards = 10;
+  this.cardUnicode = "";
+
+  this.cardUnicode = {
+    "1C": "A&#9827",
+    "1S": "A&#9824",
+    "1H": "<font color='red'>A&#9829</font>",
+    "1D": "<font color='red'>A&#9830</font>",
+    "2C": "10&#9827",
+    "2S": "10&#9824",
+    "2H": "<font color='red'>10&#9829</font>",
+    "2D": "<font color='red'>10&#9830</font>",
+    "3C": "B&#9827",
+    "3S": "B&#9824",
+    "3H": "<font color='red'>B&#9829</font>",
+    "3D": "<font color='red'>B&#9830</font>",
+    "4C": "D&#9827",
+    "4S": "D&#9824",
+    "4H": "<font color='red'>D&#9829</font>",
+    "4D": "<font color='red'>D&#9830</font>",
+    "5C": "K&#9827",
+    "5S": "K&#9824",
+    "5H": "<font color='red'>K&#9829</font>",
+    "5D": "<font color='red'>K&#9830</font>",
+  };
 
   // this.actionCard = false;
   // this.requestActionCard = false;
