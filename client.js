@@ -276,7 +276,7 @@ socket.on("updateTricksWonByPlayer", function (data) {
         if (pixel >= 0) {
           pixel = (pixel + 40) * -1;
         } else {
-          if (pixel <= -40) pixel = pixel - 1;
+          if (pixel <= -40) pixel = pixel;
           if (index % data.table.playerLimitAct == 0) {
             pixel = pixel + 45;
           }
