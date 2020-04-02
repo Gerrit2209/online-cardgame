@@ -179,7 +179,7 @@ io.sockets.on("connection", function (socket) {
     var player = room.getPlayer(socket.id);
     var table = room.getTable(socket.tableID);
     //reset, nur in neuer Runde, nicht initial
-    player.turnFinished = "";
+    player.turnFinished = false;
     player.trickCards = "";
     player.currPlayedCard = "";
     player.trickCardsNo = "";
@@ -206,23 +206,28 @@ io.sockets.on("connection", function (socket) {
         // table.players[i].hand = table.gameObj.drawCard(table.pack, 8, "", 1); //assign initial 5 cards to players
         var startingPlayerID = table.playersID[randomNumber]; //get the ID of the randomly selected player who will start
         // if (table.players[i].id === startingPlayerID) { //this player will start the turn
-        table.players[i].turnFinished = false;
+        // table.players[i].turnFinished = false;
         console.log(table.players[i].name + " starts the game.");
         io.sockets.sockets[table.players[i].id].emit("updateHand", {
           hand: table.players[i].hand,
         }); //send the cards in hands to player
-        io.sockets.sockets[table.players[i].id].emit("turn", { myturn: true }); //send the turn-signal to player
+        io.sockets.sockets[table.players[i].id].emit("isMyTurn", {
+          myturn: true,
+        }); //send the turn-signal to player
         io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
-        io.sockets.sockets[table.players[i].id].emit("showTrickNo", {
+        io.sockets.sockets[table.players[i].id].emit("updateTischNr", {
+          tischNr: socket.tableID,
+        }); //send the 'ready' signal
+        io.sockets.sockets[table.players[i].id].emit("updateTrickNo", {
           roundNo: table.roundNo,
         });
         // } else {
         //   table.players[i].turnFinished = true;
         //   console.log(table.players[i].name + " will not start the game.");
         //   io.sockets.sockets[table.players[i].id].emit("updateHand", { hand: table.players[i].hand }); //send the card in hands to player
-        //   io.sockets.sockets[table.players[i].id].emit("turn", { myturn: false }); //send the turn-signal to player
+        //   io.sockets.sockets[table.players[i].id].emit("isMyTurn", { myturn: false }); //send the turn-signal to player
         //   io.sockets.sockets[table.players[i].id].emit("ready", { ready: true }); //send the 'ready' signal
-        //   io.sockets.sockets[table.players[i].id].emit("showTrickNo", {cardsInHand: table.players[i].hand.length});
+        //   io.sockets.sockets[table.players[i].id].emit("updateTrickNo", {cardsInHand: table.players[i].hand.length});
         // }
       }
       //sends the cards to the table.
@@ -240,13 +245,13 @@ io.sockets.on("connection", function (socket) {
         "CardsOnTable at readyToPlay ===> " + JSON.stringify(table.cardsOnTable)
       );
       //messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: table.cardsOnTable}, io, table.players);
-      // io.sockets.emit("updatePackCount", { packCount: table.pack.length });
-      messaging.sendEventToAllPlayers(
-        "updateTischNr",
-        { packCount: socket.tableID },
-        io,
-        table.players
-      );
+      // io.sockets.emit("updateTischNr", { tischNr: table.pack.length });
+      // messaging.sendEventToAllPlayers(
+      //   "updateTischNr",
+      //   { tischNr: socket.tableID },
+      //   io,
+      //   table.players
+      // );
     }
   });
 
@@ -302,9 +307,9 @@ io.sockets.on("connection", function (socket) {
         // player
       );
       // table.trickNo = Math.min(table.trickNo, table.maxHandCards);
-      player.turnFinished = false;
+      player.turnFinished = true;
       messaging.sendEventToAllPlayers(
-        "turn",
+        "isMyTurn",
         { myturn: true },
         io,
         table.players
@@ -368,7 +373,7 @@ io.sockets.on("connection", function (socket) {
         table.roundNo--; // hochzählen
       }
       // }
-      player.turnFinished = true;
+      player.turnFinished = false;
       messaging.sendEventToAllPlayers(
         "logging",
         {
@@ -380,7 +385,7 @@ io.sockets.on("connection", function (socket) {
         // player
       );
       messaging.sendEventToAllPlayers(
-        "turn",
+        "isMyTurn",
         { myturn: false },
         io,
         table.players
@@ -419,7 +424,7 @@ io.sockets.on("connection", function (socket) {
         // player
       );
       messaging.sendEventToAPlayer(
-        "turn",
+        "isMyTurn",
         { myturn: true },
         io,
         table.players,
@@ -553,25 +558,26 @@ io.sockets.on("connection", function (socket) {
         table.players
       );
       console.log("CardsOnTable ===> " + JSON.stringify(table.cardsOnTable));
-      table.progressRound(player); //end of turn
+      // table.progressRound(player); //end of turn
       //notify frontend
       messaging.sendEventToAPlayer(
-        "turn",
+        "isMyTurn",
         { myturn: false },
         io,
         table.players,
         player
       );
-      //messaging.sendEventToAllPlayersButPlayer("turn", {myturn: true}, io, table.players, player);
+      //messaging.sendEventToAllPlayersButPlayer("isMyTurn", {myturn: true}, io, table.players, player);
       // messaging.sendEventToAllPlayersButPlayer(
       messaging.sendEventToAllPlayers(
-        "showTrickNo",
+        "updateTrickNo",
         { roundNo: table.roundNo },
         io,
         table.players
         // player
       );
       socket.emit("updateHand", { hand: player.hand });
+      player.turnFinished = true;
     } else {
       //end of turn
       messaging.sendEventToAPlayer(

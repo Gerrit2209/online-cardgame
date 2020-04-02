@@ -143,7 +143,7 @@ socket.on("updateTischNr", function (data) {
   $("#tischNr").text("");
   $("#tischNr").html(
     "Tisch Nr.: <span class='label label-info'>" +
-      (data.packCount + 1) +
+      (data.tischNr + 1) +
       "</span>"
   );
 });
@@ -345,7 +345,7 @@ socket.on("updateHand", function (data) {
   });
 });
 
-socket.on("turn", function (data) {
+socket.on("isMyTurn", function (data) {
   if (data.won) {
     $("#playArea").hide();
     if (data.won == "yes") {
@@ -362,7 +362,7 @@ socket.on("turn", function (data) {
       $("#progressUpdate").html(
         "<span class='label label-important'>Noch keine Karte gespielt.</span>"
       );
-      socket.emit("preliminaryRoundCheck", { tableID: socket.tableID }); //When a player has a turn, we need to control a few items, this is what enables us to make it happen.
+      // socket.emit("preliminaryRoundCheck", { tableID: socket.tableID }); //When a player has a turn, we need to control a few items, this is what enables us to make it happen.
     } else {
       $("#progressUpdate").html(
         "<span class='label label-info'>Du hast bereits eine Karte gespielt.</span>"
@@ -371,7 +371,7 @@ socket.on("turn", function (data) {
   }
 });
 
-socket.on("showTrickNo", function (data) {
+socket.on("updateTrickNo", function (data) {
   // var spanClass = "badge-success";
   // var plural = "s";
   // if (data.cardsInHand <= 2) {

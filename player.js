@@ -3,12 +3,12 @@ function Player(playerID) {
   this.name = "";
   this.tableID = "";
   this.hand = [];
-  this.status = "";
-  this.turnFinished = "";
-  this.trickCards = "";
-  this.currPlayedCard = "";
-  this.trickCardsNo = "";
-  this.cardOrder = 1;
+  this.status = ""; //?
+  this.turnFinished = ""; //true or false
+  this.trickCards = ""; // Alle gewonnen Stiche
+  this.trickCardsNo = ""; // Nr der Stiche
+  this.currPlayedCard = ""; // Zuletzt gespielte Karte
+  this.cardOrder = 1; //Init sortCards
 }
 
 Player.prototype.setName = function (name) {

@@ -59,15 +59,15 @@ function Table(tableID) {
   this.gameObj = null;
 }
 
-Table.prototype.progressRound = function (player) {
-  for (var i = 0; i < this.players.length; i++) {
-    this.players[i].turnFinished = false;
-    if (this.players[i].id == player.id) {
-      //when player is the same that plays, end their turn
-      player.turnFinished = true;
-    }
-  }
-};
+// Table.prototype.progressRound = function (player) {
+//   for (var i = 0; i < this.players.length; i++) {
+//     this.players[i].turnFinished = false;
+//     if (this.players[i].id == player.id) {
+//       //when player is the same that plays, end their turn
+//       player.turnFinished = true;
+//     }
+//   }
+// };
 
 Table.prototype.setName = function (name) {
   this.name = name;

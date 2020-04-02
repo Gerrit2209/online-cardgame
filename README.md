@@ -38,17 +38,24 @@ socket.io Reihenfolge
 ++++++++++++++++++++++++++++++++++++++++
 
 socket.on(connection)
-// socket.emit(connectToServer)
-socket.on(connectToServer)=logging
-// socket.emit(connectToTable) 4x
+----------socket.emit(connectToServer)
+socket.on(connectToServer):logging
+----------socket.emit(connectToTable) 4x
 socket.on(connectToTable)
 evToAllPlay(timer)
-socket.on(timer)
-socket.emit(readyToPlay)
-socket.on(readyToPlay):
+----------socket.on(timer)
+----------socket.emit(readyToPlay)
+socket.on(readyToPlay)
 player[i]emit(updateHand)
-player[i]emit(hand)
-player[i]emit(ready)
-player[i]emit(ShowTrickNo)
+player[i]emit(isMyTurn): Noch keine Karte gespielt/bereits Karte ges.
+player[i]emit(ready): waiting.hide, playArea.show
+player[i]emit(updateTischNr): #TischNR
+player[i]emit(updateTrickNo): #round
 evToAllPlay(updateCardsonTable)
-evToAllPlay(updateTischNr) //loeschen
+
+socket.on(sortCards)
+socket.on(playCard)
+socket.on(returnCard)
+socket.on(takeTrick)
+socket.on(returnTrick)
+socket.on(seeLastTrick)
