@@ -1,8 +1,8 @@
 function Room(name) {
-  this.players = [];
-  this.tables = [];
-  this.name = name;
-  this.tableLimit = 10;
+  this.players = []; // ?
+  this.tables = []; // ?
+  this.name = name; // "DokoRoom"
+  this.tableLimit = 10; // number of tazble
 }
 
 Room.prototype.addPlayer = function (player) {

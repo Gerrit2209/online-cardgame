@@ -3,7 +3,7 @@ function Player(playerID) {
   this.name = "";
   this.tableID = "";
   this.hand = [];
-  this.status = ""; //?
+  this.status = ""; //available (bei diconnect) / intable (connect to table/table.addPlayer) / playing (readyToPlay)
   this.turnFinished = ""; //true or false
   this.trickCards = ""; // Alle gewonnen Stiche
   this.trickCardsNo = ""; // Nr der Stiche
@@ -39,16 +39,16 @@ Player.prototype.setStatus = function (status) {
   this.status = status;
 };
 
-Player.prototype.isAvailable = function () {
-  return this.status === "available";
-};
+// Player.prototype.isAvailable = function () {
+//   return this.status === "available";
+// };
 
-Player.prototype.isInTable = function () {
-  return this.status === "intable";
-};
+// Player.prototype.isInTable = function () {
+//   return this.status === "intable";
+// };
 
-Player.prototype.isPlaying = function () {
-  return this.status === "playing";
-};
+// Player.prototype.isPlaying = function () {
+//   return this.status === "playing";
+// };
 
 module.exports = Player;

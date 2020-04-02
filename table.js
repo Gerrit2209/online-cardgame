@@ -8,22 +8,22 @@ Array.prototype.remove = function (from, to) {
 
 function Table(tableID) {
   this.id = tableID;
-  this.name = "";
+  this.name = ""; //?
   this.status = "available";
   this.players = [];
   this.playersID = [];
-  this.readyToPlayCounter = 0;
-  this.playerLimit = 4;
-  this.spectatorLimit = 1;
   this.pack = [];
   this.cardsOnTable = [];
-  this.trickNo = 1;
-  this.trickCards = {};
-  this.trickTakenBy = {};
-  this.seeLastTrickCounter = 0;
-  this.roundNo = 1;
-  this.maxHandCards = 10;
   this.cardUnicode = "";
+  this.trickNo = 1;
+  this.roundNo = 1;
+  this.readyToPlayCounter = 0; //init für readyToPlay
+  this.playerLimit = 4;
+  this.spectatorLimit = 1;
+  this.trickCards = {}; // Stiche
+  this.trickTakenBy = {}; // wer hat sie gewonnen
+  this.seeLastTrickCounter = 0; //?
+  this.maxHandCards = 10; // handCards
 
   this.cardUnicode = {
     "1C": "A&#9827",
@@ -81,17 +81,17 @@ Table.prototype.setStatus = function (status) {
   this.status = status;
 };
 
-Table.prototype.isAvailable = function () {
-  return this.status === "available";
-};
+// Table.prototype.isAvailable = function () {
+//   return this.status === "available";
+// };
 
 Table.prototype.isFull = function () {
   return this.status === "full";
 };
 
-Table.prototype.isPlaying = function () {
-  return this.status === "playing";
-};
+// Table.prototype.isPlaying = function () {
+//   return this.status === "playing";
+// };
 
 Table.prototype.addPlayer = function (player) {
   if (this.status === "available") {

@@ -33,7 +33,7 @@ app.get("/", function (req, res) {
 var utils = new Utils();
 // var firstRound = 1; //aktuell nicht in Verwendung
 var messaging = new Messaging();
-var room = new Room("Doko Room");
+var room = new Room("DokoRoom");
 room.tables = messaging.createSampleTables(room.tableLimit); //10 anstatt 1 Table
 
 //
@@ -307,7 +307,10 @@ io.sockets.on("connection", function (socket) {
         // player
       );
       // table.trickNo = Math.min(table.trickNo, table.maxHandCards);
-      player.turnFinished = true;
+      for (let i = 0; i < table.playerLimit; i++) {
+        table.players[i].turnFinished = false;
+      }
+      // player.turnFinished = false; //zurücksetzen
       messaging.sendEventToAllPlayers(
         "isMyTurn",
         { myturn: true },
@@ -373,7 +376,10 @@ io.sockets.on("connection", function (socket) {
         table.roundNo--; // hochzählen
       }
       // }
-      player.turnFinished = false;
+      // player.turnFinished = false;
+      for (let i = 0; i < table.playerLimit; i++) {
+        table.players[i].turnFinished = true;
+      }
       messaging.sendEventToAllPlayers(
         "logging",
         {
@@ -591,6 +597,8 @@ io.sockets.on("connection", function (socket) {
         table.players,
         player
       );
+      console.log("!player.turnFinished" + !player.turnFinished);
+      console.log("table.cardsOnTable.length" + table.cardsOnTable.length);
     }
   });
 }); //end of socket.on

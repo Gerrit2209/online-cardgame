@@ -59,3 +59,9 @@ socket.on(returnCard)
 socket.on(takeTrick)
 socket.on(returnTrick)
 socket.on(seeLastTrick)
+socket.on(disconnect)
+
+Neue Runde
+----------click newRound
+----------socket.emit(readyToPlay)
+socket.on(readyToPlay)...
