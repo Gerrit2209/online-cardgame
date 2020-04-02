@@ -1,8 +1,8 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
-var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
+// var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 // } else {
-// var socket = io.connect("localhost:5000");
+var socket = io.connect("localhost:5000");
 // socket.data = { tableID: 1 };
 // var ID = 1; //$("#tableID").val();
 // }
@@ -139,7 +139,7 @@ function playCard(key, value) {
   //}
 }
 
-socket.on("updatePackCount", function (data) {
+socket.on("updateTischNr", function (data) {
   $("#tischNr").text("");
   $("#tischNr").html(
     "Tisch Nr.: <span class='label label-info'>" +

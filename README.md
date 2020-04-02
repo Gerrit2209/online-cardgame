@@ -26,4 +26,30 @@ git push heroku master
 heroku ps:scale web=1
 heroku local
 
+testing with mocha (npm install --save-dev mocha)
+npm install --save-dev live-server
+
 letzten Stich auf knopf
+
+++++++++++++++++++++++++++++++++++++++++
+
+socket.io Reihenfolge
+
+++++++++++++++++++++++++++++++++++++++++
+
+socket.on(connection)
+socket.emit(connectToServer)
+socket.on(connectToServer)
+->logging
+socket.emit(connectToTable) 4x
+socket.on(connectToTable)
+evToAllPlay(timer)
+socket.on(timer)
+socket.emit(readyToPlay)
+socket.on(readyToPlay):
+player[i]emit(updateHand)
+player[i]emit(hand)
+player[i]emit(ready)
+player[i]emit(ShowTrickNo)
+evToAllPlay(updateCardsonTable)
+evToAllPlay(updatePackCount) //loeschen

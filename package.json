@@ -8,10 +8,13 @@
     "web": "http://tamaspiros.co.uk"
   },
   "dependencies": {
+    "chai": "^4.2.0",
     "express": "latest",
     "jquery": "^3.4.1",
     "node-uuid": "~1.4.1",
-    "socket.io": "latest"
+    "socket-tester": "^1.2.1",
+    "socket.io": "latest",
+    "socket.io-client": "^2.3.0"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
@@ -21,6 +24,8 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^2.5.0",
     "husky": "^4.2.3",
+    "live-server": "^1.2.1",
+    "mocha": "^7.1.1",
     "prettier": "2.0.2",
     "pretty-quick": "^2.0.1"
   },
@@ -28,5 +33,9 @@
     "hooks": {
       "pre-commit": "pretty-quick --staged"
     }
+  },
+  "scripts": {
+    "test": "mocha",
+    "test:browser": "live-server --port=5000 --mount=/:public"
   }
 }

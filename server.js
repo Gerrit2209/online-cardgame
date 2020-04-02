@@ -57,6 +57,7 @@ io.sockets.on("connection", function (socket) {
     player.setName(name);
     room.addPlayer(player); //add to room -- all players go to a room first
     io.sockets.emit("logging", { message: name + " has connected to server." });
+    // io.sockets.emit("logging", "test");
   });
 
   /* 
@@ -156,7 +157,7 @@ io.sockets.on("connection", function (socket) {
   });
 
   socket.on("newRound", function (data) {
-    console.log("Ready to play called");
+    console.log("newRound called");
     var player = room.getPlayer(socket.id);
     var table = room.getTable(socket.tableID);
   });
@@ -241,7 +242,7 @@ io.sockets.on("connection", function (socket) {
       //messaging.sendEventToAllPlayers('updateCardsOnTable', {cardsOnTable: table.cardsOnTable, lastCardOnTable: table.cardsOnTable}, io, table.players);
       // io.sockets.emit("updatePackCount", { packCount: table.pack.length });
       messaging.sendEventToAllPlayers(
-        "updatePackCount",
+        "updateTischNr",
         { packCount: socket.tableID },
         io,
         table.players
