@@ -57,7 +57,7 @@ Game.prototype.takeTrick = function (table, player) {
   var cards = [];
   //return cards;
   cards = table.cardsOnTable;
-  if (cards.length == table.playerLimitAct) {
+  if (cards.length == table.playerLimit) {
     table.trickCards[table.trickNo] = cards;
     table.trickTakenBy[table.trickNo] = player;
     // table.trickCards.push(cards);
@@ -84,7 +84,7 @@ Game.prototype.takeTrick = function (table, player) {
 
 Game.prototype.returnTrick = function (table, player) {
   if (table.cardsOnTable.length == "") {
-    table.cardsOnTable = player.trickCards.splice(-table.playerLimitAct);
+    table.cardsOnTable = player.trickCards.splice(-table.playerLimit);
     return true;
   } else {
     return false;

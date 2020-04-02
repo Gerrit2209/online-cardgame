@@ -38,9 +38,8 @@ socket.io Reihenfolge
 ++++++++++++++++++++++++++++++++++++++++
 
 socket.on(connection)
-socket.emit(connectToServer)
-socket.on(connectToServer)
-->logging
+-socket.emit(connectToServer)
+socket.on(connectToServer)=logging
 socket.emit(connectToTable) 4x
 socket.on(connectToTable)
 evToAllPlay(timer)
@@ -52,4 +51,4 @@ player[i]emit(hand)
 player[i]emit(ready)
 player[i]emit(ShowTrickNo)
 evToAllPlay(updateCardsonTable)
-evToAllPlay(updatePackCount) //loeschen
+evToAllPlay(updateTischNr) //loeschen

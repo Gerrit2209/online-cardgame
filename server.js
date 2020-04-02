@@ -102,7 +102,7 @@ io.sockets.on("connection", function (socket) {
         io,
         table.players
       );
-      if (table.players.length < table.playerLimitAct) {
+      if (table.players.length < table.playerLimit) {
         messaging.sendEventToAllPlayers(
           "logging",
           {
@@ -110,7 +110,7 @@ io.sockets.on("connection", function (socket) {
               "There is " +
               table.players.length +
               " player at this table. The table requires " +
-              table.playerLimitAct +
+              table.playerLimit +
               " active players to join.",
           },
           io,
@@ -191,8 +191,8 @@ io.sockets.on("connection", function (socket) {
     //Initial & jede neue Runde
     player.status = "playing";
     table.readyToPlayCounter++;
-    var randomNumber = Math.floor(Math.random() * table.playerLimitAct);
-    if (table.readyToPlayCounter === table.playerLimitAct) {
+    var randomNumber = Math.floor(Math.random() * table.playerLimit);
+    if (table.readyToPlayCounter === table.playerLimit) {
       table.cardsOnTable = table.gameObj.playFirstCardToTable(table.pack); //assign first card on table
       table.status = "unavailable"; //set the table status to unavailable
       for (var i = 0; i < table.players.length; i++) {
@@ -311,7 +311,7 @@ io.sockets.on("connection", function (socket) {
         // player
       );
       table.trickNo++;
-      // table.trickNo = Math.min(table.trickNo, table.playerLimitAct);
+      // table.trickNo = Math.min(table.trickNo, table.playerLimit);
       if (table.trickNo != table.maxHandCards + 1) {
         var stich = Math.min(table.trickNo, table.maxHandCards); //obergrenze Stichanzahls-Anzeige
         messaging.sendEventToAllPlayers(
@@ -336,7 +336,7 @@ io.sockets.on("connection", function (socket) {
         {
           message:
             "Du kannst den Stich erst bei " +
-            table.playerLimitAct +
+            table.playerLimit +
             " Karten nehmen.",
         },
         io,
@@ -489,7 +489,7 @@ io.sockets.on("connection", function (socket) {
 
     if (
       !player.turnFinished &&
-      table.cardsOnTable.length != table.playerLimitAct
+      table.cardsOnTable.length != table.playerLimit
     ) {
       var playedCard = data.playedCard;
       var index = data.index; //from client

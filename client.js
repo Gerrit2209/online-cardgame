@@ -247,7 +247,7 @@ socket.on("updateTricksWonByPlayer", function (data) {
   //   "<div style='margin-top:2px; margin-left:0px; float: left; z-index:1' '=''><img class='card0' width='100' src='resources/4C.png'></div>"
   // );
   // $("#table").text("<p> Test </p>");
-  for (let i = 0; i < data.table.playerLimitAct; i++) {
+  for (let i = 0; i < data.table.playerLimit; i++) {
     var a = 0;
     var b = 0;
     var c = 0;
@@ -270,14 +270,14 @@ socket.on("updateTricksWonByPlayer", function (data) {
             v +
             ".png /></div>"
         );
-        if (index % data.table.playerLimitAct == 1) {
+        if (index % data.table.playerLimit == 1) {
           pixel = pixel - 45;
         }
         if (pixel >= 0) {
           pixel = (pixel + 40) * -1;
         } else {
           if (pixel <= -40) pixel = pixel;
-          if (index % data.table.playerLimitAct == 0) {
+          if (index % data.table.playerLimit == 0) {
             pixel = pixel + 45;
           }
         }
