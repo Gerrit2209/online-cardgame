@@ -190,10 +190,10 @@ Game.prototype.sortCards = function (table, player) {
 
 //no card at start
 //at the start of the game, we put one card to the table from the pack (top card of the deck)
-Game.prototype.playFirstCardToTable = function (pack) {
-  return "";
-  // return  pack.splice(0,1);//hier weitermachen
-};
+// Game.prototype.playFirstCardToTable = function (pack) {
+//   return "";
+//   // return  pack.splice(0,1);//hier weitermachen
+// };
 
 //plays a card with specific index, from specific hand, and places the card on the table
 Game.prototype.playCard = function (index, hand, table) {

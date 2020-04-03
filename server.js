@@ -51,7 +51,7 @@ io.sockets.on("connection", function (socket) {
   socket.on("connectToServer", function (data) {
     //direkt nach "join"-Button
     console.log("connectToServer called by " + socket.id);
-    socket.data = { tableID: 1 }; //Test auf Socket schreiben
+    socket.data = { tableID: 1 }; //Test, um auf Socket schreiben
     var player = new Player(socket.id);
     var name = data.name; //get the player's name
     player.setName(name);
@@ -160,6 +160,25 @@ io.sockets.on("connection", function (socket) {
     console.log("newRound called");
     var player = room.getPlayer(socket.id);
     var table = room.getTable(socket.tableID);
+    table.newRoundCounter++;
+    //reset, nur in neuer Runde, nicht initial
+    player.turnFinished = false;
+    player.trickCards = "";
+    player.currPlayedCard = "";
+    player.trickCardsNo = "";
+    player.cardOrder = 1;
+    //table
+    table.trickNo = 1;
+    table.trickCards = {};
+    table.trickTakenBy = {};
+    table.seeLastTrickCounter = 0;
+    if (table.newRoundCounter == table.playerLimit) {
+      console.log("newPackCreated");
+      var game = new Game();
+      table.pack = game.pack;
+      messaging.sendEventToAllPlayers("newRoundOk", {}, io, table.players);
+    }
+    // socket.emit("newRoundOk");
   });
   /*
   Once the counter has finished both clients will emit a "readyToPlay" message
@@ -178,22 +197,13 @@ io.sockets.on("connection", function (socket) {
     console.log("Ready to play called");
     var player = room.getPlayer(socket.id);
     var table = room.getTable(socket.tableID);
-    //reset, nur in neuer Runde, nicht initial
-    player.turnFinished = false;
-    player.trickCards = "";
-    player.currPlayedCard = "";
-    player.trickCardsNo = "";
-    player.cardOrder = 1;
-    table.trickNo = 1;
-    table.trickCards = {};
-    table.trickTakenBy = {};
-    table.seeLastTrickCounter = 0;
     //Initial & jede neue Runde
     player.status = "playing";
+    table.newRoundCounter = 0;
     table.readyToPlayCounter++;
     var randomNumber = Math.floor(Math.random() * table.playerLimit);
     if (table.readyToPlayCounter === table.playerLimit) {
-      table.cardsOnTable = table.gameObj.playFirstCardToTable(table.pack); //assign first card on table
+      // table.cardsOnTable = table.gameObj.playFirstCardToTable(table.pack); //assign first card on table
       table.status = "unavailable"; //set the table status to unavailable
       for (var i = 0; i < table.players.length; i++) {
         //go through the players array (contains all players sitting at a table)

@@ -18,6 +18,7 @@ function Table(tableID) {
   this.trickNo = 1;
   this.roundNo = 1;
   this.readyToPlayCounter = 0; //init für readyToPlay
+  this.newRoundCounter = 0;
   this.playerLimit = 4;
   this.spectatorLimit = 1;
   this.trickCards = {}; // Stiche

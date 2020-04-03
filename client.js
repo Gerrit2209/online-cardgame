@@ -1,8 +1,8 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
-var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
+// var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 // } else {
-// var socket = io.connect("localhost:5000");
+var socket = io.connect("localhost:5000");
 // socket.data = { tableID: 1 };
 // var ID = 1; //$("#tableID").val();
 // }
@@ -76,7 +76,8 @@ $(document).ready(function () {
   //newRound
   $("#newRound").click(function () {
     // socket.emit("penalisingTaken", { tableID: 1 });
-    socket.emit("readyToPlay");
+    socket.emit("newRound");
+    // socket.emit("readyToPlay");
     $("#newRound").hide();
     $("#playArea").hide();
   });
@@ -100,6 +101,12 @@ socket.on("timer", function (data) {
     socket.emit("readyToPlay", { tableID: socket.tableID });
     $("#counter").hide();
   }
+});
+
+socket.on("newRoundOk", function () {
+  //startet neue Runde
+  socket.emit("readyToPlay", { tableID: socket.tableID });
+  $("#playArea").show();
 });
 
 socket.on("playOption", function (data) {
