@@ -109,7 +109,6 @@ Game.prototype.returnCard = function (table, player) {
 };
 
 Game.prototype.sortCards = function (table, player) {
-  player.cardOrder++;
   var standard = [
     "2H",
     "4C",
@@ -132,7 +131,7 @@ Game.prototype.sortCards = function (table, player) {
     "1H",
     "5H",
   ];
-  var solo = [
+  var fleischloser = [
     "1C",
     "2C",
     "5C",
@@ -154,9 +153,75 @@ Game.prototype.sortCards = function (table, player) {
     "4D",
     "3D",
   ];
+  var damen = [
+    "4C",
+    "4S",
+    "4H",
+    "4D",
+    "3C",
+    "3S",
+    "3H",
+    "3D",
+    "1C",
+    "2C",
+    "5C",
+    "1S",
+    "2S",
+    "5S",
+    "1H",
+    "2H",
+    "5H",
+    "1D",
+    "2D",
+    "5D",
+  ];
+  var buben = [
+    "3C",
+    "3S",
+    "3H",
+    "3D",
+    "1C",
+    "2C",
+    "5C",
+    "4C",
+    "1S",
+    "2S",
+    "5S",
+    "4S",
+    "1H",
+    "2H",
+    "5H",
+    "4H",
+    "1D",
+    "2D",
+    "5D",
+    "4D",
+  ];
+  // var solo4 = [
+  //   "1D",
+  //   "2D",
+  //   "5D",
+  //   "4D",
+  //   "3D",
+  //   "1C",
+  //   "2C",
+  //   "5C",
+  //   "4C",
+  //   "3C",
+  //   "1S",
+  //   "2S",
+  //   "5S",
+  //   "4S",
+  //   "3S",
+  //   "1H",
+  //   "2H",
+  //   "5H",
+  //   "4H",
+  //   "3H"
+  // ];
   var card = "";
   var newHand = "";
-  if (player.cardOrder % 2 == 0) {
+  if (player.cardOrder % 4 == 0) {
     for (let i = 0; i < standard.length; i++) {
       var searchCard = standard[i];
       card = player.hand.filter(sortFunction);
@@ -167,9 +232,9 @@ Game.prototype.sortCards = function (table, player) {
       }
     }
     player.hand = newHand;
-  } else if (player.cardOrder % 2 == 1) {
-    for (let i = 0; i < solo.length; i++) {
-      var searchCard = solo[i];
+  } else if (player.cardOrder % 4 == 1) {
+    for (let i = 0; i < fleischloser.length; i++) {
+      var searchCard = fleischloser[i];
       card = player.hand.filter(sortFunction);
       if (card != "" && newHand.length == "") {
         newHand = card;
@@ -177,10 +242,42 @@ Game.prototype.sortCards = function (table, player) {
         newHand = newHand.concat(card);
       }
     }
-    // console.log("playerHandBefore " + JSON.stringify(player.hand))
     player.hand = newHand;
-    // console.log("playerHandAfter " + JSON.stringify(player.hand))
-  }
+  } else if (player.cardOrder % 4 == 2) {
+    for (let i = 0; i < damen.length; i++) {
+      var searchCard = damen[i];
+      card = player.hand.filter(sortFunction);
+      if (card != "" && newHand.length == "") {
+        newHand = card;
+      } else if (card != "") {
+        newHand = newHand.concat(card);
+      }
+    }
+    player.hand = newHand;
+  } else if (player.cardOrder % 4 == 3) {
+    for (let i = 0; i < buben.length; i++) {
+      var searchCard = buben[i];
+      card = player.hand.filter(sortFunction);
+      if (card != "" && newHand.length == "") {
+        newHand = card;
+      } else if (card != "") {
+        newHand = newHand.concat(card);
+      }
+    }
+    player.hand = newHand;
+  } //else if (player.cardOrder % 5 == 4) {
+  //   for (let i = 0; i < solo4.length; i++) {
+  //     var searchCard = solo4[i];
+  //     card = player.hand.filter(sortFunction);
+  //     if (card != "" && newHand.length == "") {
+  //       newHand = card;
+  //     } else if (card != "") {
+  //       newHand = newHand.concat(card);
+  //     }
+  //   }
+  //   player.hand = newHand;
+  // }
+  player.cardOrder++;
   function sortFunction(cV) {
     return cV == searchCard;
   }

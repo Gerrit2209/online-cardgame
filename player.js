@@ -8,7 +8,7 @@ function Player(playerID) {
   this.trickCards = ""; // Alle gewonnen Stiche
   this.trickCardsNo = ""; // Nr der Stiche
   this.currPlayedCard = ""; // Zuletzt gespielte Karte
-  this.cardOrder = 1; //Init sortCards
+  this.cardOrder = 0; //Init sortCards
 }
 
 Player.prototype.setName = function (name) {

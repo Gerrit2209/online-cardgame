@@ -166,7 +166,7 @@ io.sockets.on("connection", function (socket) {
     player.trickCards = "";
     player.currPlayedCard = "";
     player.trickCardsNo = "";
-    player.cardOrder = 1;
+    player.cardOrder = 0;
     //table
     table.trickNo = 1;
     table.trickCards = {};
