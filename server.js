@@ -493,6 +493,22 @@ io.sockets.on("connection", function (socket) {
       );
     }
   });
+  socket.on("diceBtn", function () {
+    console.log("diceBtn called");
+    var player = room.getPlayer(socket.id);
+    var table = room.getTable(socket.tableID);
+    var dice = Math.ceil(Math.random() * 6);
+    // if (table.trickNo > 1) {
+    // console.log("seeLastTrick called if-cond");
+    // var cardsReturned = table.gameObj.sortCards(table, player);
+    messaging.sendEventToAllPlayers(
+      "logging",
+      { message: player.name + " würfelt eine " + dice },
+      io,
+      table.players
+    );
+    // }
+  });
 
   socket.on("playCard", function (data) {
     console.log("playCard called");

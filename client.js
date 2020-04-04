@@ -1,8 +1,8 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
-var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
+// var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 // } else {
-// var socket = io.connect("localhost:5000");
+var socket = io.connect("localhost:5000");
 // socket.data = { tableID: 1 };
 // var ID = 1; //$("#tableID").val();
 // }
@@ -71,6 +71,11 @@ $(document).ready(function () {
   //seeLastTrick
   $("#seeLastTrick").click(function () {
     socket.emit("seeLastTrick");
+    // socket.emit("sortCards", { tableID: socket.tableID });
+  });
+  //rollTheDice
+  $("#diceBtn").click(function () {
+    socket.emit("diceBtn");
     // socket.emit("sortCards", { tableID: socket.tableID });
   });
   //newRound
