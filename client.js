@@ -17,7 +17,8 @@ $(document).ready(function () {
   $("#newRound").hide();
   $("#numberRequest").hide();
   $("#suiteRequest").hide();
-  $("#tableID").hide();
+  $("#tableBackup").hide();
+  $("#tableBackupBtn").hide();
   $("form").submit(function (event) {
     event.preventDefault();
   });
@@ -35,19 +36,41 @@ $(document).ready(function () {
       socket.emit("connectToServer", { name: name });
       // socket.emit("connectToTable", { tableID: ID });
       socket.emit("connectToTable");
-      $("#loginForm").hide();
+      // $("#loginForm").hide();
+      $("#name").hide();
+      $("#join").hide();
       $("#tableFull").hide();
       $("#waiting").show();
       socket.on("ready", function (data) {
         $("#waiting").hide();
         $("#playArea").show();
         $("#progressUpdate").show();
+        $("#tableBackup").show();
+        $("#tableBackupBtn").show();
       });
     } else {
       $("#error").show();
       $("#error").append('<p class="text-error">Please enter a name.</p>');
     }
   });
+
+  $("#tableBackupBtn").click(function () {
+    var dat = $("#tableBackup").val();
+    if (dat.length > 0) {
+      socket.emit("tableBackupBtn", { datString: dat });
+      // socket.emit("connectToTable", { tableID: ID });
+      // socket.emit("connectToTable");
+      $("#tableBackup").hide();
+      $("#tableBackupBtn").hide();
+      // $("#waiting").show();
+    } else {
+      $("#error").show();
+      $("#error").append(
+        '<p class="text-error">Please enter a tableBackup.</p>'
+      );
+    }
+  });
+
   //Stich nehmen
   $("#takeTrick").click(function () {
     socket.emit("takeTrick");

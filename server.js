@@ -288,6 +288,54 @@ io.sockets.on("connection", function (socket) {
     }
   });
 
+  socket.on("tableBackupBtn", function (data) {
+    console.log("tableBackupBtn called");
+    var table = room.getTable(socket.tableID);
+    var tableNew = table;
+    var backupTable = JSON.parse(data.datString);
+    tableNew = backupTable;
+    for (let i = 0; i < backupTable.players.length; i++) {
+      for (let j = 0; j < table.players.length; j++) {
+        if (backupTable.players[i].name == table.players[j].name) {
+          tableNew.players[i].id = table.players[j].id;
+          tableNew.playersID[i] = table.playersID[j];
+        }
+      }
+    }
+    table = tableNew;
+    room.tables[0].cardsOnTable = table.cardsOnTable;
+    // room.tables[0].gameObj = table.gameObj;
+    room.tables[0].newRoundCounter = table.newRoundCounter;
+    room.tables[0].pack = table.pack;
+    room.tables[0].players = table.players;
+    room.tables[0].playersID = table.playersID;
+    room.tables[0].roundNo = table.roundNo;
+    room.tables[0].trickNo = table.trickNo;
+    room.tables[0].trickTakenBy = table.trickTakenBy;
+    room.players = table.players;
+    for (let i = 0; i < table.players.length; i++) {
+      io.sockets.sockets[table.players[i].id].emit("updateHand", {
+        hand: table.players[i].hand,
+      });
+    }
+    // messaging.sendEventToAllPlayers(
+    //   // "updateCardsOnTable",
+    //   "updateHand",
+    //   {
+    //     cardsOnTable: table.cardsOnTable,
+    //     trickNo: table.trickNo
+    //   },
+    //   io,
+    //   table.players
+    // );
+    messaging.sendEventToAllPlayers(
+      "logging",
+      { message: "Wiederherstellungspunkt wiederhergestellt." },
+      io,
+      table.players
+    );
+  });
+
   socket.on("takeTrick", function () {
     //Stich nehmen
     console.log("Stich nehmen called");
@@ -348,6 +396,7 @@ io.sockets.on("connection", function (socket) {
         //   table.players
         // );
       }
+      console.log("Table  ===> " + JSON.stringify(room));
     } else {
       messaging.sendEventToAPlayer(
         "logging",
