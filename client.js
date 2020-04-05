@@ -2,7 +2,7 @@
 // if (port == null || port == "") {//local vs. heroku
 // var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
 var socket = io.connect(
-  "https://ec2-3-122-252-172.eu-central-1.compute.amazonaws.com:5000"
+  "http://ec2-3-122-252-172.eu-central-1.compute.amazonaws.com:5000"
 );
 // } else {
 // var socket = io.connect("localhost:5000");
