@@ -268,7 +268,8 @@ io.sockets.on("connection", function (socket) {
   socket.on("disconnect", function () {
     console.log("disconnect called");
     var player = room.getPlayer(socket.id);
-    if (player && player.status === "intable") {
+    // if (player && player.status === "intable") {
+    if (player != null && player.status === "intable") {
       console.log(
         "player was in table. player: " +
           player +
