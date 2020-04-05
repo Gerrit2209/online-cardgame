@@ -396,7 +396,7 @@ io.sockets.on("connection", function (socket) {
         //   table.players
         // );
       }
-      console.log("Table  ===> " + JSON.stringify(room));
+      console.log("Table  ===> " + JSON.stringify(table));
     } else {
       messaging.sendEventToAPlayer(
         "logging",

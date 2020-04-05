@@ -174,6 +174,8 @@ function playCard(key, value) {
     playedCard: playedCard,
     index: index,
   });
+  $("#tableBackup").hide();
+  $("#tableBackupBtn").hide();
   //}
 }
 
