@@ -303,15 +303,15 @@ io.sockets.on("connection", function (socket) {
       }
     }
     table = tableNew;
-    room.tables[0].cardsOnTable = table.cardsOnTable;
+    room.tables[table.id].cardsOnTable = table.cardsOnTable;
     // room.tables[0].gameObj = table.gameObj;
-    room.tables[0].newRoundCounter = table.newRoundCounter;
-    room.tables[0].pack = table.pack;
-    room.tables[0].players = table.players;
-    room.tables[0].playersID = table.playersID;
-    room.tables[0].roundNo = table.roundNo;
-    room.tables[0].trickNo = table.trickNo;
-    room.tables[0].trickTakenBy = table.trickTakenBy;
+    room.tables[table.id].newRoundCounter = table.newRoundCounter;
+    room.tables[table.id].pack = table.pack;
+    room.tables[table.id].players = table.players;
+    room.tables[table.id].playersID = table.playersID;
+    room.tables[table.id].roundNo = table.roundNo;
+    room.tables[table.id].trickNo = table.trickNo;
+    room.tables[table.id].trickTakenBy = table.trickTakenBy;
     room.players = table.players;
     for (let i = 0; i < table.players.length; i++) {
       io.sockets.sockets[table.players[i].id].emit("updateHand", {
@@ -330,7 +330,7 @@ io.sockets.on("connection", function (socket) {
     // );
     messaging.sendEventToAllPlayers(
       "logging",
-      { message: "Wiederherstellungspunkt wiederhergestellt." },
+      { message: "Backup wiederhergestellt." },
       io,
       table.players
     );

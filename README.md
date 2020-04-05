@@ -65,3 +65,5 @@ Neue Runde
 ----------click newRound
 ----------socket.emit(readyToPlay)
 socket.on(readyToPlay)...
+
+ssh ec2-user@3.122.252.172 -i Doko.pem
