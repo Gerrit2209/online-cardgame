@@ -3,7 +3,7 @@ function Player(playerID) {
   this.name = "";
   this.tableID = "";
   this.hand = [];
-  this.status = ""; //available (bei diconnect) / intable (connect to table/table.addPlayer) / playing (readyToPlay)
+  this.status = ""; //available (bei diconnect) / intable (connect to table/table.addPlayer) / playing (readyToPlay) / spectating
   this.turnFinished = ""; //true or false
   this.trickCards = ""; // Alle gewonnen Stiche
   this.trickCardsNo = ""; // Nr der Stiche

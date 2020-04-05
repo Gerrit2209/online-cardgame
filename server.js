@@ -51,7 +51,7 @@ io.sockets.on("connection", function (socket) {
   socket.on("connectToServer", function (data) {
     //direkt nach "join"-Button
     console.log("connectToServer called by " + socket.id);
-    socket.data = { tableID: 1 }; //Test, um auf Socket schreiben
+    // socket.data = { tableID: 1 }; //Test, um auf Socket schreiben
     var player = new Player(socket.id);
     var name = data.name; //get the player's name
     player.setName(name);
@@ -156,6 +156,65 @@ io.sockets.on("connection", function (socket) {
     }
   });
 
+  socket.on("connectToTableSpect", function () {
+    //
+    var player = room.getPlayer(socket.id);
+    var table = room.getTable(0);
+    socket.tableID = table.id;
+    // for (let i = 0; i < room.tableLimit; i++) {
+    //   var table = room.getTable(i);
+    //   if (table.status == "available") {
+    //     socket.tableID = i;
+    //     break;
+    //   }
+    // }
+    console.log(
+      "connectToTableSpect called. tableID:" +
+        socket.tableID +
+        " & table.status: " +
+        table.status
+    );
+    table.players.push(player);
+    player.tableID = table.id;
+    player.status = "spectating";
+    table.playersID.push(socket.id); //probably not needed
+    messaging.sendEventToAllPlayers(
+      "logging",
+      {
+        message:
+          player.name +
+          " has connected to table: " +
+          table.name +
+          " as a spectator.",
+      },
+      io,
+      table.players
+    );
+    // messaging.sendEventToAllPlayers(
+    //   "logging",
+    //   {
+    //     message:
+    //       "There are " +
+    //       table.players.length +
+    //       " players at this table. Play will commence shortly."
+    //   },
+    //   io,
+    //   table.players
+    // );
+    //emit counter
+    /* var countdown = 1; //3 seconds in reality...
+    console.log("3 sec timer starting...");
+    setInterval(function () {
+      countdown--;
+      messaging.sendEventToAllPlayers(
+        "timer",
+        { countdown: countdown },
+        io,
+        table.players
+      );
+    }, 1000); */
+  });
+
   socket.on("newRound", function (data) {
     console.log("newRound called");
     var player = room.getPlayer(socket.id);
@@ -172,6 +231,9 @@ io.sockets.on("connection", function (socket) {
     table.trickCards = {};
     table.trickTakenBy = {};
     table.seeLastTrickCounter = 0;
+    if (table.newRoundCounter <= table.playerLimit) {
+      player.status = "intable";
+    }
     if (table.newRoundCounter == table.playerLimit) {
       console.log("newPackCreated");
       var game = new Game();
@@ -198,7 +260,7 @@ io.sockets.on("connection", function (socket) {
     var player = room.getPlayer(socket.id);
     var table = room.getTable(socket.tableID);
     //Initial & jede neue Runde
-    player.status = "playing";
+    // player.status = "playing";
     table.newRoundCounter = 0;
     table.readyToPlayCounter++;
     var randomNumber = Math.floor(Math.random() * table.playerLimit);
@@ -206,6 +268,11 @@ io.sockets.on("connection", function (socket) {
       // table.cardsOnTable = table.gameObj.playFirstCardToTable(table.pack); //assign first card on table
       table.status = "unavailable"; //set the table status to unavailable
       for (var i = 0; i < table.players.length; i++) {
+        if (table.players[i].status == "spectating") {
+          continue;
+        } else {
+          table.players[i].status = "playing";
+        }
         //go through the players array (contains all players sitting at a table)
         table.players[i].hand = table.gameObj.drawCard(
           table.pack,
@@ -214,7 +281,7 @@ io.sockets.on("connection", function (socket) {
           1
         ); //assign initial 5 cards to players
         // table.players[i].hand = table.gameObj.drawCard(table.pack, 8, "", 1); //assign initial 5 cards to players
-        var startingPlayerID = table.playersID[randomNumber]; //get the ID of the randomly selected player who will start
+        // var startingPlayerID = table.playersID[randomNumber]; //get the ID of the randomly selected player who will start
         // if (table.players[i].id === startingPlayerID) { //this player will start the turn
         // table.players[i].turnFinished = false;
         console.log(table.players[i].name + " starts the game.");
@@ -355,6 +422,9 @@ io.sockets.on("connection", function (socket) {
           io,
           table.players
         );
+        for (let i = 0; i < table.players.length; i++) {
+          table.players[i].status = "spectating";
+        }
       }
       messaging.sendEventToAllPlayers(
         "logging",

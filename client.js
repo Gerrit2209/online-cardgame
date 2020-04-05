@@ -1,11 +1,11 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
 // var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
-var socket = io.connect(
-  "http://ec2-3-122-252-172.eu-central-1.compute.amazonaws.com:5000"
-);
+// var socket = io.connect(
+//   "http://ec2-3-122-252-172.eu-central-1.compute.amazonaws.com:5000"
+// );
 // } else {
-// var socket = io.connect("localhost:5000");
+var socket = io.connect("localhost:5000");
 // socket.data = { tableID: 1 };
 // var ID = 1; //$("#tableID").val();
 // }
@@ -43,6 +43,7 @@ $(document).ready(function () {
       $("#name").hide();
       $("#join").hide();
       $("#tableFull").hide();
+      $("#spect").hide();
       $("#waiting").show();
       socket.on("ready", function (data) {
         $("#waiting").hide();
@@ -55,6 +56,22 @@ $(document).ready(function () {
       $("#error").show();
       $("#error").append('<p class="text-error">Please enter a name.</p>');
     }
+  });
+
+  $("#spect").click(function () {
+    var name = $("#name").val();
+    socket.emit("connectToServer", { name: name });
+    socket.emit("connectToTableSpect");
+    $("#playArea").show();
+    $("#name").hide();
+    $("#join").hide();
+    $("#spect").hide();
+    $("#counter").hide();
+    $("#hand").hide();
+    $("#takeTrick").hide();
+    $("#returnTrick").hide();
+    $("#returnCard").hide();
+    $("#sortCards").hide();
   });
 
   $("#tableBackupBtn").click(function () {
@@ -138,6 +155,11 @@ socket.on("newRoundOk", function () {
   //startet neue Runde
   socket.emit("readyToPlay", { tableID: socket.tableID });
   $("#playArea").show();
+  $("#hand").show();
+  $("#takeTrick").show();
+  $("#returnTrick").show();
+  $("#returnCard").show();
+  $("#sortCards").show();
 });
 
 socket.on("playOption", function (data) {

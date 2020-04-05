@@ -29,7 +29,7 @@ heroku local
 testing with mocha (npm install --save-dev mocha)
 npm install --save-dev live-server
 
-letzten Stich auf knopf
+ssh ec2-user@3.122.252.172 -i Doko.pem
 
 ++++++++++++++++++++++++++++++++++++++++
 
@@ -65,5 +65,3 @@ Neue Runde
 ----------click newRound
 ----------socket.emit(readyToPlay)
 socket.on(readyToPlay)...
-
-ssh ec2-user@3.122.252.172 -i Doko.pem
