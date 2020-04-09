@@ -28,8 +28,34 @@
         margin: 0 auto -150px;
       }
 
+      #links {
+        margin-top: -20px;
+        /* margin-left: 50px; */
+        /* margin-top: 5px; */
+      }
+
+      /* #playOption { */
+      #tableName {
+        margin-top: 10px;
+        /* margin-left: 50px; */
+        /* margin-top: 5px; */
+      }
+
       #table {
-        margin-top: 5px;
+        margin-top: -20px;
+        margin-left: 50px;
+        /* margin-top: 5px; */
+      }
+
+      #hand {
+        margin-top: -20px;
+        margin-left: 50px;
+        /* margin-top: 5px; */
+      }
+      #lastTrick {
+        /* margin-top: -20px; */
+        margin-left: 50px;
+        /* margin-top: 5px; */
       }
 
       /* Set the fixed height of the footer here */
@@ -46,7 +72,8 @@
         content: "Logging";
         float: left;
         margin-left: -230px;
-        margin-top: 65px;
+        margin-top: 32px;
+        /* margin-top: 65px; */
         position: fixed;
       }
     </style>
@@ -66,7 +93,25 @@
           <!-- <div class="span9"> -->
           <!-- <p>Hello and welcome to Macaonline. Please have a <a href="#myModal" data-toggle="modal">look at the rules</a> before playing.</p> -->
           <!-- <p align="center">Willkommen beim Doppelklupf</p> -->
-          <!-- <p align="center">Gerrit Kevin Lars Nils Steffen</p> -->
+          <!-- <p align="center">
+            DokoRolle: - Satzung: https://tinyurl.com/Doppelklupf
+          </p> -->
+          <p align="center" id="links">
+            <a
+              align="center"
+              href="https://tinyurl.com/Doppelklupf"
+              target="_blank"
+              >Doko-Satzung
+            </a>
+            und
+            <a
+              align="center"
+              href="https://docs.google.com/spreadsheets/d/1F9Y0oFtSz5QQq2rf3rYlMdjUbEzk1EgZ-QuKoxFXMFE/edit?usp=sharing"
+              target="_blank"
+              >Doko-Rolle</a
+            >
+          </p>
+          <p align="center" id="playerOrder"></p>
           <!-- </div> -->
           <div id="counter"></div>
         </div>
@@ -137,20 +182,20 @@
         </div>
         <div id="playArea">
           <p id="playOption"></p>
-          <button id="takeTrick" class="btn btn-success">Stich nehmen</button>
-          <button id="returnTrick" class="btn btn-success">
+          <button id="takeTrick" class="btn btn-primary">Stich nehmen</button>
+          <button id="returnTrick" class="btn btn-primary">
             Stich zurückgeben
           </button>
-          <button id="returnCard" class="btn btn-success">
+          <button id="returnCard" class="btn btn-primary">
             Karte zurücknehmen
           </button>
-          <button id="sortCards" class="btn btn-success">sortieren</button>
-          <button id="seeLastTrick" class="btn btn-success">
-            Letzer Stick
+          <button id="sortCards" class="btn btn-primary">sortieren</button>
+          <button id="seeLastTrick" class="btn btn-primary">
+            Letzer Stich
           </button>
           <button id="diceBtn" class="btn btn-warning">würfeln</button>
           <button id="newRound" class="btn btn-warning">Neue Runde!</button>
-          <p>Tisch</p>
+          <p id="tableName">Tisch</p>
           <!-- <p>(Discard pile)</p> -->
           <p id="table"></p>
           <br />

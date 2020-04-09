@@ -25,6 +25,7 @@ function Table(tableID) {
   this.trickTakenBy = {}; // wer hat sie gewonnen
   this.seeLastTrickCounter = 0; //?
   this.maxHandCards = 10; // handCards
+  this.playerOrder = [];
 
   this.cardUnicode = {
     "1C": "A&#9827",

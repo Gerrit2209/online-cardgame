@@ -1,11 +1,11 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
 // var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
-var socket = io.connect(
-  "http://ec2-3-122-252-172.eu-central-1.compute.amazonaws.com:5000"
-);
+// var socket = io.connect(
+//   "http://ec2-3-122-252-172.eu-central-1.compute.amazonaws.com:5000"
+// );
 // } else {
-// var socket = io.connect("localhost:5000");
+var socket = io.connect("localhost:5000");
 // socket.data = { tableID: 1 };
 // var ID = 1; //$("#tableID").val();
 // }
@@ -40,6 +40,7 @@ $(document).ready(function () {
       // socket.emit("connectToTable", { tableID: ID });
       socket.emit("connectToTable");
       // $("#loginForm").hide();
+      $("#error").hide();
       $("#name").hide();
       $("#join").hide();
       $("#tableFull").hide();
@@ -172,11 +173,11 @@ socket.on("playOption", function (data) {
   }
 });
 
-socket.on("showRequestCardDialog", function (data) {
-  if (data.option == "suite") {
-    $("#suiteRequest").show();
-  }
-});
+// socket.on("showRequestCardDialog", function (data) {
+//   if (data.option == "suite") {
+//     $("#suiteRequest").show();
+//   }
+// });
 
 function playCard(key, value) {
   index = key;
@@ -208,6 +209,20 @@ socket.on("updateTischNr", function (data) {
       (data.tischNr + 1) +
       "</span>"
   );
+});
+
+socket.on("updatePlayerOrder", function (data) {
+  var name = "";
+  for (let i = 0; i < data.nameAll.length; i++) {
+    if (data.nameAll[i] == data.nameOne) {
+      name = [name + " - <font color='red'>" + data.nameAll[i] + "</font>"];
+    } else {
+      name = [name + " - " + data.nameAll[i]];
+    }
+  }
+  // name = name.slice(3);
+  $("#playerOrder").text("");
+  $("#playerOrder").html([name + " -"]);
 });
 
 socket.on("updateCardsOnTable", function (data) {
@@ -427,7 +442,7 @@ socket.on("isMyTurn", function (data) {
       // socket.emit("preliminaryRoundCheck", { tableID: socket.tableID }); //When a player has a turn, we need to control a few items, this is what enables us to make it happen.
     } else {
       $("#progressUpdate").html(
-        "<span class='label label-info'>Du hast bereits eine Karte gespielt.</span>"
+        "<span class='label label-success'>Du hast bereits eine Karte gespielt.</span>"
       );
     }
   }

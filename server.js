@@ -102,6 +102,7 @@ io.sockets.on("connection", function (socket) {
         io,
         table.players
       );
+      table.playerOrder.push(player.name);
       if (table.players.length < table.playerLimit) {
         messaging.sendEventToAllPlayers(
           "logging",
@@ -160,6 +161,9 @@ io.sockets.on("connection", function (socket) {
     //
     var player = room.getPlayer(socket.id);
     var table = room.getTable(0);
+    if (table.playerOrder.length < table.playerLimit + table.spectatorLimit) {
+      table.playerOrder.push(player.name);
+    }
     socket.tableID = table.id;
     // for (let i = 0; i < room.tableLimit; i++) {
     //   var table = room.getTable(i);
@@ -430,6 +434,24 @@ io.sockets.on("connection", function (socket) {
         "logging",
         {
           message: player.name + " nimmt Stich " + table.trickNo + "",
+        },
+        io,
+        table.players
+        // player
+      );
+      //playerOrder //aktuell nur für einen spectator implementiert
+      var spectName = null;
+      for (let i = 0; i < table.players.length; i++) {
+        if (table.players[i].status == "spectating") {
+          spectName = table.players[i].name;
+        }
+      }
+      messaging.sendEventToAllPlayers(
+        "updatePlayerOrder",
+        {
+          nameAll: table.playerOrder,
+          nameOne: player.name,
+          spectName: spectName,
         },
         io,
         table.players
@@ -735,10 +757,12 @@ io.sockets.on("connection", function (socket) {
       messaging.sendEventToAPlayer(
         "logging",
         {
-          message:
-            "Du hast bereits eine Karte gespielt. CardsOnTable = " +
-            table.cardsOnTable.length,
+          message: "Du hast bereits eine Karte gespielt.",
         },
+        //   message:
+        //     "Du hast bereits eine Karte gespielt. CardsOnTable = " +
+        //     table.cardsOnTable.length
+        // },
         io,
         table.players,
         player
