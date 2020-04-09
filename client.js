@@ -1,11 +1,11 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
 // var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
-// var socket = io.connect(
-//   "http://ec2-3-122-252-172.eu-central-1.compute.amazonaws.com:5000"
-// );
+var socket = io.connect(
+  "http://ec2-3-122-252-172.eu-central-1.compute.amazonaws.com:5000"
+);
 // } else {
-var socket = io.connect("localhost:5000");
+// var socket = io.connect("localhost:5000");
 // socket.data = { tableID: 1 };
 // var ID = 1; //$("#tableID").val();
 // }
@@ -232,7 +232,15 @@ socket.on("updateTischNr", function (data) {
 
 socket.on("updatePlayerOrder", function (data) {
   var name = "";
+  var nameTemp = "";
   var j = 0;
+  var iSpect = "";
+  for (let i = 0; i < data.nameAll.length; i++) {
+    iSpect = i;
+    if (data.nameAll[i] == data.spectName) {
+      break;
+    }
+  }
   for (let i = 0; i < data.nameAll.length; i++) {
     if (data.playCard == "0") {
       if (data.nameAll[i] == data.nameOne) {
@@ -243,21 +251,35 @@ socket.on("updatePlayerOrder", function (data) {
         name = [name + " - " + data.nameAll[i]];
       }
     } else if (data.playCard == "1") {
-      if (data.nameAll[3] == data.nameOne && j == 0 && data.nCards != 3) {
-        name = [name + " - <font color='red'>" + data.nameAll[i] + "</font>"];
-        j = 1;
-      } else if (data.nameAll[i] == data.nameOne) {
-        name = [name + " - " + data.nameAll[i]];
-        j = 2;
-      } else if (data.nameAll[i] == data.spectName) {
-        name = [name + " - <font color='gray'>" + data.nameAll[i] + "</font>"];
-      } else if (j == 2 && data.nCards != 3) {
-        name = [name + " - <font color='red'>" + data.nameAll[i] + "</font>"];
-        j = 3;
+      nameTemp = data.nameAll;
+
+      if (data.nameAll[i] == data.spectName) {
+        nameTemp[i] = ["<font color='gray'>" + nameTemp[i] + "</font>"];
+      } else if (data.nameAll[i] == data.nameOne && data.nCards != 3) {
+        if ((i + 1) % 5 == iSpect) {
+          nameTemp[(i + 2) % 5] = [
+            "<font color='red'>" + nameTemp[(i + 2) % 5] + "</font>",
+          ];
+        } else {
+          nameTemp[(i + 1) % 5] = [
+            "<font color='red'>" + nameTemp[(i + 1) % 5] + "</font>",
+          ];
+        }
       } else {
-        name = [name + " - " + data.nameAll[i]];
+        nameTemp[i] = [nameTemp[i]];
       }
+      // } else if (data.nameAll[i] == data.nameOne) {
+      //   name = [name + " - " + data.nameAll[i]];
+      //   j = 2;
+      // } else if (j == 2 && data.nCards != 3) {
+      //   name = [name + " - <font color='red'>" + data.nameAll[i] + "</font>"];
+      //   j = 3;
       // name = [name + " ++ "];
+    }
+  }
+  if (data.playCard == "1") {
+    for (let ii = 0; ii < data.nameAll.length; ii++) {
+      name = [name + " - " + nameTemp[ii]];
     }
   }
   // name = name.slice(3);
