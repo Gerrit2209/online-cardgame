@@ -265,6 +265,7 @@ io.sockets.on("connection", function (socket) {
     var table = room.getTable(socket.tableID);
     //Initial & jede neue Runde
     // player.status = "playing";
+    player.trickCards = "";
     table.newRoundCounter = 0;
     table.readyToPlayCounter++;
     var randomNumber = Math.floor(Math.random() * table.playerLimit);
@@ -273,6 +274,8 @@ io.sockets.on("connection", function (socket) {
       table.status = "unavailable"; //set the table status to unavailable
       for (var i = 0; i < table.players.length; i++) {
         if (table.players[i].status == "spectating") {
+          io.sockets.sockets[table.players[i].id].emit("spectView", {});
+          table.players[i].trickCardsNo = "";
           continue;
         } else {
           table.players[i].status = "playing";
@@ -384,6 +387,7 @@ io.sockets.on("connection", function (socket) {
     room.tables[table.id].roundNo = table.roundNo;
     room.tables[table.id].trickNo = table.trickNo;
     room.tables[table.id].trickTakenBy = table.trickTakenBy;
+    room.tables[table.id].playerOrder = table.playerOrder;
     room.players = table.players;
     for (let i = 0; i < table.players.length; i++) {
       io.sockets.sockets[table.players[i].id].emit("updateHand", {
@@ -452,13 +456,14 @@ io.sockets.on("connection", function (socket) {
           nameAll: table.playerOrder,
           nameOne: player.name,
           spectName: spectName,
+          playCard: "0",
         },
         io,
         table.players
         // player
       );
       // table.trickNo = Math.min(table.trickNo, table.maxHandCards);
-      for (let i = 0; i < table.playerLimit; i++) {
+      for (let i = 0; i < table.playerLimit + table.spectatorLimit; i++) {
         table.players[i].turnFinished = false;
       }
       // player.turnFinished = false; //zurücksetzen
@@ -674,6 +679,26 @@ io.sockets.on("connection", function (socket) {
       var index = data.index; //from client
       var serverIndex = utils.indexOf(player.hand, data.playedCard);
       // console.log("Table  ===> " + JSON.stringify(table))
+
+      var spectName = null;
+      for (let i = 0; i < table.players.length; i++) {
+        if (table.players[i].status == "spectating") {
+          spectName = table.players[i].name;
+        }
+      }
+      messaging.sendEventToAllPlayers(
+        "updatePlayerOrder",
+        {
+          nameAll: table.playerOrder,
+          nameOne: player.name,
+          spectName: spectName,
+          playCard: "1",
+          nCards: table.cardsOnTable.length,
+        },
+        io,
+        table.players
+        // player
+      );
 
       console.log("index => " + index + " | serverindex ==> " + serverIndex);
 

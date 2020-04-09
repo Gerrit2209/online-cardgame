@@ -75,6 +75,23 @@ $(document).ready(function () {
     $("#sortCards").hide();
   });
 
+  socket.on("spectView", function () {
+    // var name = $("#name").val();
+    // socket.emit("connectToServer", { name: name });
+    // socket.emit("connectToTableSpect");
+    $("#playArea").show();
+    $("#name").hide();
+    $("#join").hide();
+    $("#spect").hide();
+    $("#counter").hide();
+    $("#hand").hide();
+    $("#takeTrick").hide();
+    $("#returnTrick").hide();
+    $("#returnCard").hide();
+    $("#sortCards").hide();
+    $("#newRound").hide();
+  });
+
   $("#tableBackupBtn").click(function () {
     var dat = $("#tableBackup").val();
     if (dat.length > 0) {
@@ -154,7 +171,9 @@ socket.on("timer", function (data) {
 
 socket.on("newRoundOk", function () {
   //startet neue Runde
+  $("#loginForm").hide();
   socket.emit("readyToPlay", { tableID: socket.tableID });
+  $("#progressUpdate").show();
   $("#playArea").show();
   $("#hand").show();
   $("#takeTrick").show();
@@ -213,11 +232,32 @@ socket.on("updateTischNr", function (data) {
 
 socket.on("updatePlayerOrder", function (data) {
   var name = "";
+  var j = 0;
   for (let i = 0; i < data.nameAll.length; i++) {
-    if (data.nameAll[i] == data.nameOne) {
-      name = [name + " - <font color='red'>" + data.nameAll[i] + "</font>"];
-    } else {
-      name = [name + " - " + data.nameAll[i]];
+    if (data.playCard == "0") {
+      if (data.nameAll[i] == data.nameOne) {
+        name = [name + " - <font color='red'>" + data.nameAll[i] + "</font>"];
+      } else if (data.nameAll[i] == data.spectName) {
+        name = [name + " - <font color='gray'>" + data.nameAll[i] + "</font>"];
+      } else {
+        name = [name + " - " + data.nameAll[i]];
+      }
+    } else if (data.playCard == "1") {
+      if (data.nameAll[3] == data.nameOne && j == 0 && data.nCards != 3) {
+        name = [name + " - <font color='red'>" + data.nameAll[i] + "</font>"];
+        j = 1;
+      } else if (data.nameAll[i] == data.nameOne) {
+        name = [name + " - " + data.nameAll[i]];
+        j = 2;
+      } else if (data.nameAll[i] == data.spectName) {
+        name = [name + " - <font color='gray'>" + data.nameAll[i] + "</font>"];
+      } else if (j == 2 && data.nCards != 3) {
+        name = [name + " - <font color='red'>" + data.nameAll[i] + "</font>"];
+        j = 3;
+      } else {
+        name = [name + " - " + data.nameAll[i]];
+      }
+      // name = [name + " ++ "];
     }
   }
   // name = name.slice(3);
@@ -324,7 +364,7 @@ socket.on("updateTricksWonByPlayer", function (data) {
   //   "<div style='margin-top:2px; margin-left:0px; float: left; z-index:1' '=''><img class='card0' width='100' src='resources/4C.png'></div>"
   // );
   // $("#table").text("<p> Test </p>");
-  for (let i = 0; i < data.table.playerLimit; i++) {
+  for (let i = 0; i < data.table.playerLimit + data.table.spectatorLimit; i++) {
     var a = 0;
     var b = 0;
     var c = 0;
