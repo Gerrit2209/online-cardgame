@@ -1,5 +1,5 @@
 const http = require("http");
-const host = "ec2-18-193-15sdfw0-60.eu-central-1.compute.amazonaws.com";
+const host = "https://fine-idea-280312.ew.r.appspot.com/";
 // const host = "localhost";
 const port = 8000;
 const requestListener = function (req, res) {
