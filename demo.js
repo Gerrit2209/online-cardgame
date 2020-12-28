@@ -1,6 +1,6 @@
 const http = require("http");
-const host = "ec2-user@ec2-3-123-40-145.eu-central-1.compute.amazonaws.com";
-// const host = "localhost";
+// const host = "ec2-user@ec2-3-123-40-145.eu-central-1.compute.amazonaws.com";
+const host = "localhost";
 const port = 5000;
 const requestListener = function (req, res) {
   res.writeHead(200);
