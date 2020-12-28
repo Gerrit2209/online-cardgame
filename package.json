@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "chai": "^4.2.0",
-    "express": "latest",
+    "express": "^4.17.1",
     "jquery": "^3.4.1",
     "node-uuid": "~1.4.1",
     "socket-tester": "^1.2.1",

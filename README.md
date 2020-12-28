@@ -65,3 +65,26 @@ Neue Runde
 ----------click newRound
 ----------socket.emit(readyToPlay)
 socket.on(readyToPlay)...
+
+Dependencies
+
+Gerrits-MacBook-Pro:online-cardgame gerrit\$ npm list
+online-cardgame@0.0.1 /Users/gerrit/Git/online-cardgame
+├── chai@4.2.0
+├── eslint-config-airbnb@18.1.0
+├── eslint-plugin-import@2.20.1
+├── eslint-plugin-jsx-a11y@6.2.3
+├── eslint-plugin-react-hooks@2.5.0
+├── eslint-plugin-react@7.19.0
+├── eslint@6.8.0
+├── express@4.17.1
+├── husky@4.2.3
+├── jquery@3.4.1
+├── live-server@1.2.1
+├── mocha@7.1.1
+├── node-uuid@1.4.8
+├── prettier@2.0.2
+├── pretty-quick@2.0.1
+├── socket-tester@1.2.1
+├── socket.io-client@2.3.0
+└── socket.io@2.3.0
