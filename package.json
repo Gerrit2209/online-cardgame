@@ -1,22 +1,14 @@
 {
-  "name": "online-cardgame",
-  "description": "",
-  "version": "0.0.1",
-  "author": {
-    "name": "Tamas Piros",
-    "email": "tamas@tamaspiros.co.uk",
-    "web": "http://tamaspiros.co.uk"
+  "name": "package.json",
+  "version": "1.0.0",
+  "description": "1.0.0",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
   },
   "dependencies": {
+    "bower": "^1.8.8",
     "chai": "^4.2.0",
-    "express": "^4.17.1",
-    "jquery": "^3.4.1",
-    "node-uuid": "~1.4.1",
-    "socket-tester": "^1.2.1",
-    "socket.io": "latest",
-    "socket.io-client": "^2.3.0"
-  },
-  "devDependencies": {
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-plugin-import": "^2.20.1",
@@ -24,18 +16,31 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^2.5.0",
     "husky": "^4.2.3",
+    "jquery": "^3.4.1",
     "live-server": "^1.2.1",
-    "mocha": "^7.1.1",
-    "prettier": "2.0.2",
-    "pretty-quick": "^2.0.1"
+    "prettier": "^2.0.2",
+    "pretty-quick": "^2.0.1",
+    "socket-tester": "^1.2.1",
+    "socket.io-client": "^2.3.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
+  "devDependencies": {
+    "mocha": "^7.1.1"
   },
   "scripts": {
     "test": "mocha",
-    "test:browser": "live-server --port=5000 --mount=/:public"
-  }
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gerrit2209/online-cardgame.git"
+  },
+  "keywords": [
+    "afsdf"
+  ],
+  "author": "Gerrit",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gerrit2209/online-cardgame/issues"
+  },
+  "homepage": "https://github.com/Gerrit2209/online-cardgame#readme"
 }

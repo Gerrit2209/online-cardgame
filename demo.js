@@ -1,5 +1,5 @@
 const http = require("http");
-const host = "https://fine-idea-280312.ew.r.appspot.com/";
+const host = "fine-idea-280312.ew.r.appspot.com/";
 // const host = "localhost";
 const port = 8000;
 const requestListener = function (req, res) {
