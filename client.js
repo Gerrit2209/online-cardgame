@@ -1,13 +1,15 @@
 // let port = process.env.PORT;
 // if (port == null || port == "") {//local vs. heroku
 // var socket = io.connect("https://stark-taiga-51826.herokuapp.com");
-var socket = io.connect(
-  "http://ec2-3-123-40-145.eu-central-1.compute.amazonaws.com:5000"
-);
+// var socket = io.connect(
+//   "http://ec2-3-123-40-145.eu-central-1.compute.amazonaws.com:5000"
+// );
 // "https://fine-idea-280312.ew.r.appspot.com"
 // "http://ec2-3-122-252-172.eu-central-1.compute.amazonaws.com:5000"
 // } else {
-// var socket = io.connect("localhost:5000");
+var socket = io.connect(
+  "ec2-3-123-40-145.eu-central-1.compute.amazonaws.com:5000"
+);
 // socket.data = { tableID: 1 };
 // var ID = 1; //$("#tableID").val();
 // }
