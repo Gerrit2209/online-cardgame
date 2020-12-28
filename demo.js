@@ -1,7 +1,7 @@
 const http = require("http");
-const host = "fine-idea-280312.ew.r.appspot.com/";
+const host = "ec2-user@ec2-3-123-40-145.eu-central-1.compute.amazonaws.com";
 // const host = "localhost";
-const port = 8000;
+const port = 5000;
 const requestListener = function (req, res) {
   res.writeHead(200);
   res.end("My first server!");
