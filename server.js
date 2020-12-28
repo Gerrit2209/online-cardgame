@@ -16,10 +16,10 @@ app.use("/resources", express.static(__dirname + "/resources"));
 var server = http.createServer(app);
 
 // listen auf heroku env-Variable oder 5000
-let port = process.env.PORT; //heroku
-if (port == null || port == "") {
-  port = 5000; //local
-}
+// let port = process.env.PORT; //heroku
+// if (port == null || port == "") {
+port = 5000; //local
+// }
 server.listen(port);
 
 //???
